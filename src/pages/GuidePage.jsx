@@ -22,7 +22,7 @@ const hints = [
   },
 ];
 
-export function WorkspacePage() {
+export function GuidePage() {
   const [query, setQuery] = useState("");
 
   const visible = useMemo(() => {
@@ -37,7 +37,7 @@ export function WorkspacePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-stone-950">
-          Workspace
+          Guide
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
           Replace this page with the first module of your assignment. The notes

@@ -55,7 +55,7 @@ src/
   routes/AppRoutes.jsx     URL to page map
   components/ui/           Button, Input, Card, Spinner, EmptyState, ErrorState
   components/layout/       Header, sidebar, page shell
-  pages/                   Home, Workspace, About, 404
+  pages/                   Home, Guide, About, 404
 ```
 
 Add a feature by adding a page, a route, a nav link, and (when you need data) a function next to `getHealth` in `src/lib/api.js`.
