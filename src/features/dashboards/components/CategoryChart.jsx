@@ -4,7 +4,7 @@ import { EmptyState } from "../../../components/ui";
 function chartColors(theme) {
   const dark = theme === "dark";
   return {
-    axis: dark ? "#a1a1aa" : "#52525b",
+    axis: dark ? "#d4d4d8" : "#52525b",
     grid: dark ? "#3f3f46" : "#e4e4e7",
     tooltipBg: dark ? "#18181b" : "#ffffff",
     tooltipText: dark ? "#fafafa" : "#18181b",
@@ -34,11 +34,12 @@ export function CategoryChart({
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
           <CartesianGrid stroke={colors.grid} horizontal={false} />
-          <XAxis type="number" tick={{ fill: colors.axis, fontSize: 12 }} />
+          <XAxis type="number" stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} />
           <YAxis
             type="category"
             dataKey={nameKey}
             width={108}
+            stroke={colors.axis}
             tick={{ fill: colors.axis, fontSize: 12 }}
           />
           <Tooltip
