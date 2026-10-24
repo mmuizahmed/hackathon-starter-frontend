@@ -116,3 +116,27 @@ export function sourceLabel(source) {
   if (!source) return "—";
   return SOURCE_LABELS[source] || String(source);
 }
+
+export function formatPercent(value) {
+  if (value == null || Number.isNaN(Number(value))) return "—";
+  return `${Number(value).toLocaleString("en-PK", { maximumFractionDigits: 2 })}%`;
+}
+
+// Payslip sentences in the brief include the currency word. The digits stay in formatMoney.
+export function formatRupees(value) {
+  const amount = formatMoney(value);
+  return amount === "—" ? amount : `Rs ${amount}`;
+}
+
+export function formatDateTime(value) {
+  if (!value) return "—";
+  const parts = karachiParts(value);
+  if (!parts) return "—";
+  return `${formatDate(parts.date)}, ${parts.time}`;
+}
+
+export function titleCase(value) {
+  const text = String(value || "").replaceAll("_", " ");
+  if (!text) return "—";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

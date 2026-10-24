@@ -1,6 +1,14 @@
 import { api } from "../../lib/api";
 import { collectPages, withQuery } from "../../lib/query";
 
+export function checkIn(body = { source: "web" }, options) {
+  return api("/attendance/check-in", { method: "POST", body, ...options });
+}
+
+export function checkOut(options) {
+  return api("/attendance/check-out", { method: "POST", body: {}, ...options });
+}
+
 export function getAttendanceBoard({ date, departmentId } = {}, options) {
   return api(withQuery("/attendance/board", { date, departmentId }), options);
 }
@@ -15,6 +23,10 @@ export function listAttendance(query = {}, options) {
 
 export function listCorrections(query = {}, options) {
   return api(withQuery("/attendance/corrections", query), options);
+}
+
+export function requestCorrection(body, options) {
+  return api("/attendance/corrections", { method: "POST", body, ...options });
 }
 
 export function reviewCorrection(id, body, options) {

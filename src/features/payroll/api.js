@@ -53,6 +53,10 @@ export function listPayslips(query = {}, options) {
   return api(withQuery("/payslips", query), options);
 }
 
+export function getPayslip(id, options) {
+  return api(`/payslips/${id}`, options);
+}
+
 export async function downloadPayslipPdf(id) {
   const file = await apiBlob(`/payslips/${id}/pdf`);
   const url = URL.createObjectURL(file.blob);

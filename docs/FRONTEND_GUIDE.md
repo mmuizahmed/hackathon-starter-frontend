@@ -150,7 +150,7 @@ Submit sends:
     "officeStart": "09:00",
     "graceMinutes": 15,
     "halfDayHours": 5,
-    "weekend": ["saturday", "sunday"],
+    "weekend": ["Sat", "Sun"],
     "radiusMeters": 150,
     "officeLat": 24.8607,
     "officeLng": 67.0011
@@ -158,7 +158,7 @@ Submit sends:
 }
 ```
 
-`officeLat` and `officeLng` are omitted when blank. `weekend` is lowercase day names. The contract does not spell that out. The builder is `buildSetupPayload` in `src/features/setup/payload.js`. Change it there if the API expects another shape.
+`officeLat` and `officeLng` are omitted when blank. `weekend` uses the API's short names: `Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`. The builder is `buildSetupPayload` in `src/features/setup/payload.js`.
 
 A successful setup stores the returned user and opens the admin dashboard. The same cookie path as login is used.
 
@@ -296,11 +296,11 @@ While `loading` is true the body is a skeleton. While `error` is set the table i
 - Sidebar from `roleNavigation`. On a phone it is a drawer. Escape or the backdrop closes it.
 - Header: assistant, notifications, theme, account menu (change password, log out).
 - Main column, max width `72rem`.
-- Assistant panel, 380px, closed until the header button opens it. The panel is a placeholder until the assistant API exists.
+- Assistant panel, 380px on a desktop and a full-screen sheet on a phone. It stays mounted while closed so the chat remains in component state. The employee dashboard opens it with the `hcm:open-assistant` window event.
 
 `AuthLayout` is the frame for setup, sign in, and change password. No sidebar.
 
-Notifications are an empty placeholder. Do not invent notification rows.
+The notification menu polls `GET /api/notifications/unread-count` every 60 seconds. Opening it loads `GET /api/notifications`. Mark read and mark all read call the matching POST routes. There is no websocket.
 
 ## Dark mode
 
@@ -340,7 +340,7 @@ Admin can view attendance, corrections, leave, salary, and the payroll draft. HR
 | Salary | `pages/hr/SalaryStructuresPage.jsx`. Admin uses the Salary tab on Payroll | `GET /salary-structures`, `PUT /salary-structures/:employeeId` |
 | Payroll and payslips | `pages/hr/PayrollPage.jsx`, `pages/admin/PayrollPage.jsx` | `POST /payroll/runs`, `GET /payroll/runs/:id`, `GET /payroll/runs/:id/checks`, `POST /payroll/runs/:id/finalize`, `GET /payslips/:id/pdf` |
 
-`AttendanceCalendar` is `src/features/attendance/components/AttendanceCalendar.jsx`. It does not fetch. Pass `month` (`YYYY-MM`) and `days` (`{ date, status, workingDay, late }`). `onSelectDay` is optional. The employee attendance screen can reuse it. The grid is built from the year and month in `src/features/attendance/calendar.js`, not from the browser's local midnight.
+`AttendanceCalendar` is `src/features/attendance/components/AttendanceCalendar.jsx`. It does not fetch. Pass `month` (`YYYY-MM`) and `days` (`{ date, status, workingDay, late }`). `onSelectDay` and `selectedDate` are optional. HR and Admin leave `selectedDate` empty. My Attendance sets it. The grid is built from the year and month in `src/features/attendance/calendar.js`, not from the browser's local midnight.
 
 Hours on the board are check-out minus check-in. The board payload does not include worked minutes. Salary preview uses the same rounding as the server: HRA 40% of basic, medical 10%, gross the sum (1.5× basic). The save request omits `allowances` so the server stores that standard structure. Paid days are employed working days minus absent days, unpaid leave, and half of the half-days.
 
@@ -358,4 +358,32 @@ npm test
 npm run build
 ```
 
-`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, the attendance month grid, leave context labels, and salary math. It does not open a browser.
+`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, the attendance month grid, leave weekday preview, leave context labels, payslip line text, salary math, assistant fallback copy, and dashboard date ranges. It does not open a browser.
+
+Payslip PDF is not JSON. `apiBlob()` in `src/lib/api.js` returns the bytes. `downloadPayslipPdf` in `src/features/payroll/api.js` saves the file.
+
+## Employee self-service, dashboards, assistant
+
+These screens call the feature `api.js` files. They do not call `fetch`.
+
+| Screen | Page | What it reads and writes |
+| --- | --- | --- |
+| Employee dashboard | `src/pages/employee/DashboardPage.jsx` | `GET /api/analytics/me`, today's attendance, leave balances, announcements. Check-in and check-out. A 409 check-in shows "Already checked in today". |
+| My Attendance | `src/pages/employee/AttendancePage.jsx` | Month calendar from `GET /api/attendance/calendar`, day detail, correction form, own corrections. |
+| My Leave | `src/pages/employee/LeavePage.jsx` | Balances with remaining and pending, apply, cancel, history. Smart leave calls `POST /api/ai/smart-leave` and only pre-fills the normal form. |
+| My Payslips | `src/pages/employee/PayslipsPage.jsx` | List by month, net pay, earnings and deduction lines with their inputs, tax slab, PDF, explain, and a `wa.me` link. |
+| My Profile | `src/pages/employee/ProfilePage.jsx` | Employee 360. Save sends only `phone` and `address`. |
+| HR dashboard | `src/pages/hr/DashboardPage.jsx` | `GET /api/analytics/hr`, anomalies, and attrition risk. Filter changes refetch every widget. Absence flags and attrition risk are labeled rule-based. |
+| Admin dashboard | `src/pages/admin/DashboardPage.jsx` | `GET /api/analytics/admin`. The default range is 1 January through today so attrition is year to date. |
+| Assistant | `src/features/assistant/AssistantChat.jsx` | `POST /api/ai/chat`. Suggested questions depend on the role. Each model answer shows "AI-generated" and a Sources row from `sources`. |
+| Summarize | Both company dashboards | `POST /api/ai/summary` with the KPI JSON on screen and the current filters. A `fallback: true` response shows "AI summary unavailable" and hides the raw key bullets. |
+
+My Attendance uses the shared `AttendanceCalendar`. The employee page passes `selectedDate` so the open day stays marked. HR and Admin omit that prop. Month changes stay in the page, using `shiftMonth` from `calendar.js`.
+
+Leave apply reads `leaveTypeId` from the balance. If that field is missing, the form uses `GET /api/leave-types`.
+
+The weekday count on the apply form skips Saturday and Sunday only. The server also skips holidays and is the count that gets saved.
+
+Charts use `recharts`. Axis and tooltip colors follow the light or dark class. An empty series uses `EmptyState` instead of a blank chart. A trend that is 0% on every day still draws a marker for each day and says so.
+
+AI calls with no provider key return HTTP 200 and `fallback: true`. The panel shows that sentence. HTTP 429 shows "Too many AI requests. Try again in an hour." Smart leave fallback does not change the form.

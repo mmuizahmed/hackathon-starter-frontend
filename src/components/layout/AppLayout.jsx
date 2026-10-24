@@ -22,6 +22,16 @@ export function AppLayout() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  // The employee dashboard cannot see this state, so it opens the panel with an event.
+  useEffect(() => {
+    function onOpenAssistant() {
+      setMenuOpen(false);
+      setAssistantOpen(true);
+    }
+    window.addEventListener("hcm:open-assistant", onOpenAssistant);
+    return () => window.removeEventListener("hcm:open-assistant", onOpenAssistant);
+  }, []);
+
   useEffect(() => {
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     if (!mobile || (!menuOpen && !assistantOpen)) return undefined;

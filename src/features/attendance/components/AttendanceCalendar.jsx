@@ -15,7 +15,7 @@ function dayNumber(date) {
   return Number(date.slice(8, 10));
 }
 
-function DayCell({ date, day, today, onSelectDay }) {
+function DayCell({ date, day, today, selectedDate, onSelectDay }) {
   const status = day?.status || null;
   const label = status ? STATUS_LABELS[status] || status : day?.workingDay === false ? "Off" : "";
   const lateToo = Boolean(day?.late) && status && status !== "late";
@@ -25,7 +25,7 @@ function DayCell({ date, day, today, onSelectDay }) {
     status
       ? CELL_TONE[status] || "bg-zinc-50 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
       : "bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-500",
-    date === today ? "ring-1 ring-brand-700" : "",
+    date === selectedDate ? "ring-2 ring-brand-700" : date === today ? "ring-1 ring-brand-700" : "",
   );
 
   const body = (
@@ -51,7 +51,7 @@ function DayCell({ date, day, today, onSelectDay }) {
   );
 }
 
-export function AttendanceCalendar({ month, days = [], today = "", onSelectDay }) {
+export function AttendanceCalendar({ month, days = [], today = "", selectedDate = "", onSelectDay }) {
   const byDate = indexDays(days);
   const cells = calendarCells(month);
 
@@ -77,6 +77,7 @@ export function AttendanceCalendar({ month, days = [], today = "", onSelectDay }
               date={date}
               day={byDate.get(date)}
               today={today}
+              selectedDate={selectedDate}
               onSelectDay={onSelectDay}
             />
           );

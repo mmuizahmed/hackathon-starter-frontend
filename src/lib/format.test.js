@@ -6,6 +6,7 @@ import {
   formatDate,
   formatHours,
   formatMoney,
+  formatRupees,
   formatTime,
   hoursBetween,
   todayInKarachi,
@@ -28,4 +29,9 @@ test("formats calendar dates and hours from the timestamps", () => {
   assert.equal(formatHours(8.5), "8.50 h");
   assert.equal(formatHours(null), "—");
   assert.equal(formatMoney(150000), "150,000.00");
+});
+
+test("rupee labels use the same digits as formatMoney", () => {
+  assert.equal(formatRupees(6818.18), "Rs 6,818.18");
+  assert.equal(formatRupees(null), "—");
 });

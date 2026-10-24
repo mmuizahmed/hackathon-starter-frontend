@@ -1,5 +1,22 @@
-/**
- * Dashboard KPIs. The server computes the numbers.
- * Draw charts with `recharts` in this folder when the dashboard screens are built.
- * Add data functions here that call `api()` from src/lib/api.js.
- */
+import { api } from "../../lib/api";
+import { withQuery } from "../../lib/query";
+
+export function getMyDashboard(options) {
+  return api("/analytics/me", options);
+}
+
+export function getHrDashboard(query = {}, options) {
+  return api(withQuery("/analytics/hr", query), options);
+}
+
+export function getAdminDashboard(query = {}, options) {
+  return api(withQuery("/analytics/admin", query), options);
+}
+
+export function getAbsenceAnomalies(query = {}, options) {
+  return api(withQuery("/analytics/anomalies", query), options);
+}
+
+export function getAttritionRisk(query = {}, options) {
+  return api(withQuery("/analytics/attrition-risk", query), options);
+}
