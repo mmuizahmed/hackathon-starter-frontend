@@ -6,6 +6,7 @@ import { AdminAttendancePage } from "../pages/admin/AttendancePage";
 import { AdminAuditLogPage } from "../pages/admin/AuditLogPage";
 import { AdminCompanySettingsPage } from "../pages/admin/CompanySettingsPage";
 import { AdminDashboardPage } from "../pages/admin/DashboardPage";
+import { AdminEmployeeDetailPage } from "../pages/admin/EmployeeDetailPage";
 import { AdminEmployeesPage } from "../pages/admin/EmployeesPage";
 import { AdminLeavePage } from "../pages/admin/LeavePage";
 import { AdminLeaveSetupPage } from "../pages/admin/LeaveSetupPage";
@@ -22,6 +23,8 @@ import { HrAnnouncementsPage } from "../pages/hr/AnnouncementsPage";
 import { HrAttendancePage } from "../pages/hr/AttendancePage";
 import { HrCorrectionsPage } from "../pages/hr/CorrectionsPage";
 import { HrDashboardPage } from "../pages/hr/DashboardPage";
+import { HrCompanySettingsPage } from "../pages/hr/CompanySettingsPage";
+import { HrEmployeeDetailPage } from "../pages/hr/EmployeeDetailPage";
 import { HrEmployeesPage } from "../pages/hr/EmployeesPage";
 import { HrLeaveApprovalsPage } from "../pages/hr/LeaveApprovalsPage";
 import { HrPayrollPage } from "../pages/hr/PayrollPage";
@@ -47,6 +50,7 @@ const pages = {
   "/admin/audit": AdminAuditLogPage,
   "/admin/announcements": AdminAnnouncementsPage,
   "/hr": HrDashboardPage,
+  "/hr/settings": HrCompanySettingsPage,
   "/hr/employees": HrEmployeesPage,
   "/hr/attendance": HrAttendancePage,
   "/hr/corrections": HrCorrectionsPage,
@@ -87,8 +91,14 @@ export function AppRoutes() {
           <Route element={<RequireFreshPassword />}>
             <Route element={<AppLayout />}>
               <Route path="/" element={<HomeRedirect />} />
-              <Route element={<RequireRole roles={["admin"]} />}>{roleRoutes("admin")}</Route>
-              <Route element={<RequireRole roles={["hr"]} />}>{roleRoutes("hr")}</Route>
+              <Route element={<RequireRole roles={["admin"]} />}>
+                {roleRoutes("admin")}
+                <Route path="/admin/employees/:id" element={<AdminEmployeeDetailPage />} />
+              </Route>
+              <Route element={<RequireRole roles={["hr"]} />}>
+                {roleRoutes("hr")}
+                <Route path="/hr/employees/:id" element={<HrEmployeeDetailPage />} />
+              </Route>
               <Route element={<RequireRole roles={["employee"]} />}>{roleRoutes("employee")}</Route>
               <Route path="*" element={<NotFoundPage />} />
             </Route>

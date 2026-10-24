@@ -1,7 +1,5 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { AnnouncementBoard } from "../shared/announcements/AnnouncementBoard";
 
 export function AdminAnnouncementsPage() {
-  return (
-    <PlaceholderPage title="Announcements" description="Messages posted to the company." />
-  );
+  return <AnnouncementBoard canPost />;
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Button, FormAlert } from "../../components/ui";
 import { DEFAULT_OFFICE_SETTINGS, buildSetupPayload } from "../../features/setup/payload";
+import { readCurrentPosition } from "../../lib/geo";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { ApiError } from "../../lib/api";
 import { homePathForRole } from "../../routes/navigation";
@@ -152,31 +153,17 @@ export function SetupPage() {
 
   function onUseLocation() {
     setLocationMessage("");
-    if (!navigator.geolocation) {
-      setLocationMessage("This browser does not provide location. Type the coordinates, or leave them blank.");
-      return;
-    }
-
     setLocating(true);
-    // A precise GPS fix can stall the wizard. A normal fix is enough for a 150 m radius,
-    // and a position from the last minute is reused so the button returns quickly.
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
+    readCurrentPosition()
+      .then((position) => {
         setForm((current) => ({
           ...current,
-          officeLat: position.coords.latitude.toFixed(6),
-          officeLng: position.coords.longitude.toFixed(6),
+          officeLat: position.latitude,
+          officeLng: position.longitude,
         }));
-        setLocating(false);
-      },
-      () => {
-        setLocationMessage(
-          "Location was blocked. Enter the latitude and longitude, or leave them blank and set them later in Company Settings.",
-        );
-        setLocating(false);
-      },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
-    );
+      })
+      .catch((error) => setLocationMessage(error.message))
+      .finally(() => setLocating(false));
   }
 
   async function onSubmit(event) {

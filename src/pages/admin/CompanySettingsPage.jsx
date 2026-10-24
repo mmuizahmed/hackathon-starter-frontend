@@ -1,10 +1,5 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { CompanySettingsView } from "../shared/settings/CompanySettingsView";
 
 export function AdminCompanySettingsPage() {
-  return (
-    <PlaceholderPage
-      title="Company Settings"
-      description="Office hours, grace time, weekend days, and the office location used for attendance."
-    />
-  );
+  return <CompanySettingsView />;
 }

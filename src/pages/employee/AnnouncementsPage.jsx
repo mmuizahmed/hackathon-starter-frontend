@@ -1,7 +1,5 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { AnnouncementBoard } from "../shared/announcements/AnnouncementBoard";
 
 export function EmployeeAnnouncementsPage() {
-  return (
-    <PlaceholderPage title="Announcements" description="Messages from Admin and HR." />
-  );
+  return <AnnouncementBoard />;
 }

@@ -33,6 +33,7 @@ export const roleNavigation = {
   ],
   hr: [
     { path: "/hr", label: "Dashboard", icon: LayoutDashboard, end: true },
+    { path: "/hr/settings", label: "Company Settings", icon: Settings },
     { path: "/hr/employees", label: "Employees", icon: IdCard },
     { path: "/hr/attendance", label: "Attendance", icon: Clock },
     { path: "/hr/corrections", label: "Corrections", icon: ListChecks },

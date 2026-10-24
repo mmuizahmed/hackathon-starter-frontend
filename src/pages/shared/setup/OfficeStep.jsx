@@ -1,8 +1,6 @@
 import { MapPin } from "lucide-react";
+import { WeekendPicker } from "../../../components/forms/WeekendPicker";
 import { Button, Input } from "../../../components/ui";
-import { cn } from "../../../lib/cn";
-import { WEEK_DAYS } from "../../../features/setup/payload";
-import { focusRing } from "../../../components/ui/styles";
 
 export function OfficeStep({ form, errors, locating, locationMessage, onChange, onToggleDay, onUseLocation }) {
   return (
@@ -49,40 +47,7 @@ export function OfficeStep({ form, errors, locating, locationMessage, onChange, 
           onChange={(event) => onChange("halfDayHours", event.target.value)}
         />
       </div>
-      <div>
-        <p id="weekend-label" className="mb-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-          Weekend
-        </p>
-        <div id="weekend" tabIndex={-1} className="flex flex-wrap gap-2 rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700" role="group" aria-labelledby="weekend-label">
-          {WEEK_DAYS.map((day) => {
-            const selected = form.weekend.includes(day.value);
-            return (
-              <button
-                key={day.value}
-                type="button"
-                aria-pressed={selected}
-                className={cn(
-                  "h-9 rounded-control px-3 text-sm font-medium",
-                  focusRing,
-                  selected
-                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                    : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800",
-                )}
-                onClick={() => onToggleDay(day.value)}
-              >
-                {day.label}
-              </button>
-            );
-          })}
-        </div>
-        {errors.weekend ? (
-          <p id="weekend-error" className="mt-1 text-sm text-red-700 dark:text-red-400">
-            {errors.weekend}
-          </p>
-        ) : (
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Saturday and Sunday are off by default.</p>
-        )}
-      </div>
+      <WeekendPicker value={form.weekend} error={errors.weekend} onToggle={onToggleDay} />
       <div className="space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Office location</p>

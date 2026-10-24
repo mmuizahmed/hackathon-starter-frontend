@@ -1,4 +1,4 @@
-// The brief's office defaults. A judge should be able to accept these and move on.
+// The API stores weekend days as Sun, Mon, Tue, Wed, Thu, Fri, Sat.
 export const WEEK_DAYS = [
   { value: "Mon", label: "Mon" },
   { value: "Tue", label: "Tue" },

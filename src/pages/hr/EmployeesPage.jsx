@@ -1,10 +1,5 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { EmployeeDirectory } from "../shared/employees/EmployeeDirectory";
 
 export function HrEmployeesPage() {
-  return (
-    <PlaceholderPage
-      title="Employees"
-      description="Register people and keep their job details up to date."
-    />
-  );
+  return <EmployeeDirectory mode="manage" detailBase="/hr/employees" />;
 }
