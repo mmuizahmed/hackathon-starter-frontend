@@ -1,4 +1,9 @@
-/**
- * Employee directory, employee 360, and CSV import / export.
- * Add functions here that call `api()` from src/lib/api.js.
- */
+import { api } from "../../lib/api";
+
+export function getEmployee(id, options) {
+  return api(`/employees/${id}`, options);
+}
+
+export function updateEmployee(id, body, options) {
+  return api(`/employees/${id}`, { method: "PATCH", body, ...options });
+}

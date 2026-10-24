@@ -1,4 +1,17 @@
-/**
- * AI assistant. The browser never calls the model vendor.
- * Add functions here that call `api()` from src/lib/api.js (for example POST /ai/chat).
- */
+import { api } from "../../lib/api";
+
+export function sendChat(body, options) {
+  return api("/ai/chat", { method: "POST", body, ...options });
+}
+
+export function summarizeDashboard(body, options) {
+  return api("/ai/summary", { method: "POST", body, ...options });
+}
+
+export function parseSmartLeave(body, options) {
+  return api("/ai/smart-leave", { method: "POST", body, ...options });
+}
+
+export function explainPayslip(body, options) {
+  return api("/ai/explain-payslip", { method: "POST", body, ...options });
+}

@@ -6,7 +6,7 @@ test("default office rules match the brief", () => {
   assert.equal(DEFAULT_OFFICE_SETTINGS.officeStart, "09:00");
   assert.equal(DEFAULT_OFFICE_SETTINGS.graceMinutes, "15");
   assert.equal(DEFAULT_OFFICE_SETTINGS.halfDayHours, "5");
-  assert.deepEqual(DEFAULT_OFFICE_SETTINGS.weekend, ["saturday", "sunday"]);
+  assert.deepEqual(DEFAULT_OFFICE_SETTINGS.weekend, ["Sat", "Sun"]);
   assert.equal(DEFAULT_OFFICE_SETTINGS.radiusMeters, "150");
 });
 

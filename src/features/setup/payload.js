@@ -1,26 +1,25 @@
 // The brief's office defaults. A judge should be able to accept these and move on.
 export const WEEK_DAYS = [
-  { value: "monday", label: "Mon" },
-  { value: "tuesday", label: "Tue" },
-  { value: "wednesday", label: "Wed" },
-  { value: "thursday", label: "Thu" },
-  { value: "friday", label: "Fri" },
-  { value: "saturday", label: "Sat" },
-  { value: "sunday", label: "Sun" },
+  { value: "Mon", label: "Mon" },
+  { value: "Tue", label: "Tue" },
+  { value: "Wed", label: "Wed" },
+  { value: "Thu", label: "Thu" },
+  { value: "Fri", label: "Fri" },
+  { value: "Sat", label: "Sat" },
+  { value: "Sun", label: "Sun" },
 ];
 
 export const DEFAULT_OFFICE_SETTINGS = {
   officeStart: "09:00",
   graceMinutes: "15",
   halfDayHours: "5",
-  weekend: ["saturday", "sunday"],
+  weekend: ["Sat", "Sun"],
   officeLat: "",
   officeLng: "",
   radiusMeters: "150",
 };
 
-// `weekend` is an array of lowercase day names. The contract does not name the
-// shape; this is the one we send. Change it here if the API expects another.
+// Weekend values are the API's short names: Sun, Mon, Tue, Wed, Thu, Fri, Sat.
 export function buildSetupPayload(form) {
   const settings = {
     officeStart: form.officeStart,

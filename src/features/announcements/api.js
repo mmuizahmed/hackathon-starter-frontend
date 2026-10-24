@@ -1,4 +1,6 @@
-/**
- * Announcements.
- * Add functions here that call `api()` from src/lib/api.js.
- */
+import { api } from "../../lib/api";
+import { toQuery } from "../../lib/query";
+
+export function listAnnouncements(params = {}, options) {
+  return api(`/announcements${toQuery(params)}`, options);
+}

@@ -121,3 +121,49 @@ export async function api(path, options = {}) {
 
   return payload?.data ?? null;
 }
+
+/**
+ * Download a file such as a payslip PDF.
+ * `api()` only reads the JSON envelope, and this route returns raw bytes.
+ */
+export async function apiBlob(path, options = {}) {
+  const { headers, ...rest } = options;
+  const requestPath = String(path || "");
+  const urlPath = requestPath.startsWith("/") ? requestPath : `/${requestPath}`;
+
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}${urlPath}`, {
+      ...rest,
+      credentials: "include",
+      headers: {
+        Accept: "application/pdf, application/json",
+        ...headers,
+      },
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") throw error;
+    throw new ApiError("Cannot reach the server. Check that the API is running.", {
+      code: "unreachable",
+    });
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok || contentType.includes("application/json")) {
+    const payload = await readJson(response);
+    const message = payload?.message || `Request failed (${response.status})`;
+    if (!response.ok || payload?.success === false) {
+      if (response.status === 401) notifyUnauthorized();
+      throw new ApiError(message, {
+        status: response.status,
+        errors: normalizeFieldErrors(payload?.errors),
+        payload,
+      });
+    }
+  }
+
+  const blob = await response.blob();
+  const disposition = response.headers.get("content-disposition") || "";
+  const match = /filename="?([^"]+)"?/i.exec(disposition);
+  return { blob, filename: match?.[1] || "download.pdf" };
+}

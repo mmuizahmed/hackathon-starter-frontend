@@ -10,6 +10,7 @@ const STATUS = {
   pending: { label: "Pending", tone: "amber" },
   approved: { label: "Approved", tone: "green" },
   rejected: { label: "Rejected", tone: "red" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
 };
 
 export function StatusPill({ status }) {
