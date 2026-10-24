@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { ApiError, api, normalizeFieldErrors } from "./api.js";
+import { ApiError, api, apiBlob, normalizeFieldErrors } from "./api.js";
 
 const originalFetch = globalThis.fetch;
 const originalWindow = globalThis.window;
@@ -124,6 +124,37 @@ test("network failure is an unreachable ApiError", async () => {
   await assert.rejects(api("/setup/status"), (error) => {
     assert.equal(error.code, "unreachable");
     assert.match(error.message, /Cannot reach the server/);
+    return true;
+  });
+});
+
+test("apiBlob returns the PDF and keeps the session cookie", async () => {
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, "/api/payslips/1/pdf");
+    assert.equal(options.credentials, "include");
+    assert.equal(options.headers.Accept, "application/pdf");
+    return new Response(new Uint8Array([1, 2, 3]), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'attachment; filename="payslip-E-001-2026-10.pdf"',
+      },
+    });
+  };
+
+  const file = await apiBlob("/payslips/1/pdf");
+  assert.equal(file.filename, "payslip-E-001-2026-10.pdf");
+  const bytes = new Uint8Array(await file.blob.arrayBuffer());
+  assert.deepEqual([...bytes], [1, 2, 3]);
+});
+
+test("apiBlob surfaces a JSON error", async () => {
+  globalThis.fetch = async () =>
+    jsonResponse({ success: false, message: "Payslip not found" }, 404);
+
+  await assert.rejects(apiBlob("/payslips/missing/pdf"), (error) => {
+    assert.equal(error.status, 404);
+    assert.equal(error.message, "Payslip not found");
     return true;
   });
 });

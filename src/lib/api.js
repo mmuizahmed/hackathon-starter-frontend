@@ -121,3 +121,46 @@ export async function api(path, options = {}) {
 
   return payload?.data ?? null;
 }
+
+/**
+ * Download a file from `/api`. The payslip PDF is raw bytes, not the JSON envelope.
+ * Returns `{ blob, filename }`. Errors still use the JSON envelope.
+ */
+export async function apiBlob(path, options = {}) {
+  const { headers, ...rest } = options;
+  const requestPath = String(path || "");
+  const urlPath = requestPath.startsWith("/") ? requestPath : `/${requestPath}`;
+
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}${urlPath}`, {
+      ...rest,
+      credentials: "include",
+      headers: {
+        Accept: "application/pdf",
+        ...headers,
+      },
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") throw error;
+    throw new ApiError("Cannot reach the server. Check that the API is running.", {
+      code: "unreachable",
+    });
+  }
+
+  if (!response.ok) {
+    const payload = await readJson(response);
+    const message = payload?.message || `Request failed (${response.status})`;
+    if (response.status === 401) notifyUnauthorized();
+    throw new ApiError(message, {
+      status: response.status,
+      errors: normalizeFieldErrors(payload?.errors),
+      payload,
+    });
+  }
+
+  const blob = await response.blob();
+  const disposition = response.headers.get("Content-Disposition") || "";
+  const match = disposition.match(/filename="([^"]+)"/i);
+  return { blob, filename: match?.[1] || "download.pdf" };
+}

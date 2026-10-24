@@ -1,10 +1,5 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { PayrollWorkspace } from "../../features/payroll/components/PayrollWorkspace";
 
 export function AdminPayrollPage() {
-  return (
-    <PlaceholderPage
-      title="Payroll"
-      description="Monthly payroll. Admin reviews the draft HR prepares and finalizes it."
-    />
-  );
+  return <PayrollWorkspace role="admin" />;
 }
