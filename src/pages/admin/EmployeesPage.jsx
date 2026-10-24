@@ -1,7 +1,5 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { EmployeeDirectory } from "../shared/employees/EmployeeDirectory";
 
 export function AdminEmployeesPage() {
-  return (
-    <PlaceholderPage title="Employees" description="Every employee record in the company." />
-  );
+  return <EmployeeDirectory mode="view" detailBase="/admin/employees" />;
 }

@@ -158,7 +158,7 @@ Submit sends:
 }
 ```
 
-`officeLat` and `officeLng` are omitted when blank. `weekend` uses the API's short names: `Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`. The builder is `buildSetupPayload` in `src/features/setup/payload.js`.
+`officeLat` and `officeLng` are omitted when blank. `weekend` uses the API's short names: `Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`. The default is `["Sat", "Sun"]`. Late penalty is not part of setup. It starts off and is edited later on Company Settings. The builder is `buildSetupPayload` in `src/features/setup/payload.js`.
 
 A successful setup stores the returned user and opens the admin dashboard. The same cookie path as login is used.
 
@@ -235,6 +235,26 @@ Only for a URL that is not in the menu yet.
 The sidebar reads `navigation.js`. The router reads the `pages` object. Both must use the same path.
 
 `end: true` is only on Dashboard. Without it, Dashboard would stay highlighted on every child URL.
+
+Employee 360 is not a menu item. It is an extra route next to the role routes: `/admin/employees/:id` and `/hr/employees/:id`. HR also has `/hr/settings`, a read-only copy of Company Settings.
+
+## Organization and people
+
+API calls for these screens live next to the page, not inside `src/lib/api.js`. Lists use `withQuery` and `usePagedResource`, which is the paged form of `useAbortableRequest`.
+
+| Folder | What it calls |
+| --- | --- |
+| `src/features/organization` | Settings, departments, designations, leave types, holidays. |
+| `src/features/users` | HR logins. |
+| `src/features/employees` | Directory, register, import, export. |
+| `src/features/audit` | Audit log. |
+| `src/features/announcements` | Announcements. |
+
+Employee CSV export calls `apiBlob` with `Accept: text/csv`. That file is not wrapped in `{ success, data }`. Payslip PDFs use the same helper.
+
+A temporary password is shown once, from the server response, in `TemporaryPasswordDialog`. The UI does not keep a copy after the dialog closes.
+
+Weekend days in every form are `Sat` and `Sun`, not full English names. Company Settings sends `latePenalty.enabled` and `latePenalty.latesPerHalfDay`. Setup does not.
 
 ## Shared components
 
@@ -358,7 +378,7 @@ npm test
 npm run build
 ```
 
-`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, the attendance month grid, leave weekday preview, leave context labels, payslip line text, salary math, assistant fallback copy, and dashboard date ranges. It does not open a browser.
+`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, company settings, the attendance month grid, leave weekday preview, leave context labels, payslip line text, salary math, assistant fallback copy, and dashboard date ranges. It does not open a browser.
 
 Payslip PDF is not JSON. `apiBlob()` in `src/lib/api.js` returns the bytes. `downloadPayslipPdf` in `src/features/payroll/api.js` saves the file.
 
