@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { AssistantPanel } from "./AssistantPanel";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 
 export function AppLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const menuButtonRef = useRef(null);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -15,28 +18,57 @@ export function AppLayout() {
     function onKeyDown(event) {
       if (event.key === "Escape") setMenuOpen(false);
     }
-
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    if (!mobile || (!menuOpen && !assistantOpen)) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [menuOpen, assistantOpen]);
+
+  function closeMenu() {
+    setMenuOpen(false);
+    const button = menuButtonRef.current;
+    if (button && button.offsetParent !== null) button.focus();
+  }
+
   return (
-    <div className="min-h-screen">
+    <div className="flex h-dvh overflow-hidden bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[60] focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[90] focus:rounded-control focus:bg-white focus:px-3 focus:py-2 focus:shadow-pop dark:focus:bg-zinc-900"
       >
         Skip to content
       </a>
-      <Header
-        menuOpen={menuOpen}
-        onMenuToggle={() => setMenuOpen((open) => !open)}
-      />
-      <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-6xl">
-        <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
-        <main id="main" className="min-w-0 flex-1 px-4 py-6 sm:px-6">
-          <Outlet />
-        </main>
+      <Sidebar open={menuOpen} onClose={closeMenu} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Header
+          menuOpen={menuOpen}
+          onMenuToggle={() => {
+            setAssistantOpen(false);
+            setMenuOpen((open) => !open);
+          }}
+          assistantOpen={assistantOpen}
+          onAssistantToggle={() => {
+            setMenuOpen(false);
+            setAssistantOpen((open) => !open);
+          }}
+          menuButtonRef={menuButtonRef}
+        />
+        <div className="flex min-h-0 flex-1">
+          <main id="main" className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-6xl">
+              <Outlet />
+            </div>
+          </main>
+          <AssistantPanel open={assistantOpen} onClose={() => setAssistantOpen(false)} />
+        </div>
       </div>
     </div>
   );
