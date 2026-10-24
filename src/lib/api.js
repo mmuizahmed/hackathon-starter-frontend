@@ -123,8 +123,8 @@ export async function api(path, options = {}) {
 }
 
 /**
- * Download a file such as a payslip PDF.
- * `api()` only reads the JSON envelope, and this route returns raw bytes.
+ * Download a file from `/api`. The payslip PDF is raw bytes, not the JSON envelope.
+ * Returns `{ blob, filename }`. Errors still use the JSON envelope.
  */
 export async function apiBlob(path, options = {}) {
   const { headers, ...rest } = options;
@@ -137,7 +137,7 @@ export async function apiBlob(path, options = {}) {
       ...rest,
       credentials: "include",
       headers: {
-        Accept: "application/pdf, application/json",
+        Accept: "application/pdf",
         ...headers,
       },
     });
@@ -148,22 +148,19 @@ export async function apiBlob(path, options = {}) {
     });
   }
 
-  const contentType = response.headers.get("content-type") || "";
-  if (!response.ok || contentType.includes("application/json")) {
+  if (!response.ok) {
     const payload = await readJson(response);
     const message = payload?.message || `Request failed (${response.status})`;
-    if (!response.ok || payload?.success === false) {
-      if (response.status === 401) notifyUnauthorized();
-      throw new ApiError(message, {
-        status: response.status,
-        errors: normalizeFieldErrors(payload?.errors),
-        payload,
-      });
-    }
+    if (response.status === 401) notifyUnauthorized();
+    throw new ApiError(message, {
+      status: response.status,
+      errors: normalizeFieldErrors(payload?.errors),
+      payload,
+    });
   }
 
   const blob = await response.blob();
-  const disposition = response.headers.get("content-disposition") || "";
-  const match = /filename="?([^"]+)"?/i.exec(disposition);
+  const disposition = response.headers.get("Content-Disposition") || "";
+  const match = disposition.match(/filename="([^"]+)"/i);
   return { blob, filename: match?.[1] || "download.pdf" };
 }

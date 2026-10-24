@@ -1,12 +1,8 @@
 import { api } from "../../lib/api";
-import { toQuery } from "../../lib/query";
+import { withQuery } from "../../lib/query";
 
-export function listDepartments(params = {}, options) {
-  return api(`/departments${toQuery(params)}`, options);
-}
-
-export function listLeaveTypes(params = {}, options) {
-  return api(`/leave-types${toQuery(params)}`, options);
+export function listDepartments(query = {}, options) {
+  return api(withQuery("/departments", query), options);
 }
 
 // One extra page covers a company larger than the default page size.

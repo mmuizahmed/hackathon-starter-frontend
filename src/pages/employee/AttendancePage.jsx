@@ -1,16 +1,18 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Card, DataTable, ErrorState, PageHeader, Spinner, StatusPill } from "../../components/ui";
+import { Card, DataTable, ErrorState, IconButton, PageHeader, Spinner, StatusPill } from "../../components/ui";
 import { getAttendanceCalendar, listCorrections } from "../../features/attendance/api";
-import { formatDay, formatTime, karachiMonth, karachiToday, shiftMonth } from "../../lib/format";
+import { shiftMonth } from "../../features/attendance/calendar";
+import { AttendanceCalendar } from "../../features/attendance/components/AttendanceCalendar";
+import { currentMonthInKarachi, formatDate, formatMonth, formatTime, todayInKarachi } from "../../lib/format";
 import { CorrectionForm } from "./attendance/CorrectionForm";
 import { DayDetail } from "./attendance/DayDetail";
-import { MonthCalendar } from "./attendance/MonthCalendar";
 
 const LIMIT = 10;
 
 export function EmployeeAttendancePage() {
-  const today = karachiToday();
-  const [month, setMonth] = useState(() => karachiMonth());
+  const today = todayInKarachi();
+  const [month, setMonth] = useState(() => currentMonthInKarachi());
   const [calendar, setCalendar] = useState(null);
   const [selected, setSelected] = useState(null);
   const [calendarError, setCalendarError] = useState("");
@@ -89,16 +91,33 @@ export function EmployeeAttendancePage() {
       {calendar ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(16rem,0.8fr)]">
           <Card title="Calendar">
-            <MonthCalendar
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <IconButton
+                label="Previous month"
+                onClick={() => {
+                  setSelected(null);
+                  setMonth((current) => shiftMonth(current, -1));
+                }}
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              </IconButton>
+              <p className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{formatMonth(calendar.month || month)}</p>
+              <IconButton
+                label="Next month"
+                onClick={() => {
+                  setSelected(null);
+                  setMonth((current) => shiftMonth(current, 1));
+                }}
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </IconButton>
+            </div>
+            <AttendanceCalendar
               month={calendar.month || month}
               days={calendar.days || []}
-              selectedDate={selected?.date}
               today={today}
-              onSelect={setSelected}
-              onMonthChange={(delta) => {
-                setSelected(null);
-                setMonth((current) => shiftMonth(current, delta));
-              }}
+              selectedDate={selected?.date || ""}
+              onSelectDay={setSelected}
             />
           </Card>
           <div className="space-y-4">
@@ -113,7 +132,7 @@ export function EmployeeAttendancePage() {
         <DataTable
           caption="My attendance corrections"
           columns={[
-            { key: "date", header: "Date", render: (row) => formatDay(row.date) },
+            { key: "date", header: "Date", render: (row) => formatDate(row.date) },
             { key: "requestedCheckIn", header: "Check in", render: (row) => formatTime(row.requestedCheckIn) },
             { key: "requestedCheckOut", header: "Check out", render: (row) => formatTime(row.requestedCheckOut) },
             { key: "reason", header: "Reason", wrap: true },

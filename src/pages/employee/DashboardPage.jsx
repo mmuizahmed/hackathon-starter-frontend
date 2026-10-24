@@ -5,7 +5,7 @@ import { listAnnouncements } from "../../features/announcements/api";
 import { listAttendance } from "../../features/attendance/api";
 import { getMyDashboard } from "../../features/dashboards/api";
 import { getLeaveBalances } from "../../features/leave/api";
-import { karachiToday } from "../../lib/format";
+import { todayInKarachi } from "../../lib/format";
 import { AnnouncementList } from "./dashboard/AnnouncementList";
 import { CheckInWidget } from "./dashboard/CheckInWidget";
 import { LastPayslipCard } from "./dashboard/LastPayslipCard";
@@ -29,7 +29,7 @@ export function EmployeeDashboardPage() {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
-    const today = karachiToday();
+    const today = todayInKarachi();
     setLoading(true);
 
     Promise.allSettled([

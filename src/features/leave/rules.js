@@ -1,7 +1,16 @@
-import { addDays, weekdayIndex } from "../../lib/format.js";
-
 // Sat and Sun only. Public holidays are skipped by the server, and an employee
 // cannot read the holiday list, so this number is a preview, not the saved days.
+function weekdayIndex(dateStr) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+}
+
+function addDays(dateStr, days) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return date.toISOString().slice(0, 10);
+}
+
 export function countWeekdays(start, end) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(start || "") || !/^\d{4}-\d{2}-\d{2}$/.test(end || "")) return 0;
   if (end < start) return 0;

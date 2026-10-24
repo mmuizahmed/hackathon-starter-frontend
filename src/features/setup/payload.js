@@ -19,7 +19,7 @@ export const DEFAULT_OFFICE_SETTINGS = {
   radiusMeters: "150",
 };
 
-// Weekend values are the API's short names: Sun, Mon, Tue, Wed, Thu, Fri, Sat.
+// `weekend` is an array of short day names ("Sat", "Sun"), as the API requires.
 export function buildSetupPayload(form) {
   const settings = {
     officeStart: form.officeStart,

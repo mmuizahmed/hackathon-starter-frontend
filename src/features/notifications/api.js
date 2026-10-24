@@ -1,8 +1,8 @@
 import { api } from "../../lib/api";
-import { toQuery } from "../../lib/query";
+import { withQuery } from "../../lib/query";
 
-export function listNotifications(params = {}, options) {
-  return api(`/notifications${toQuery(params)}`, options);
+export function listNotifications(query = {}, options) {
+  return api(withQuery("/notifications", query), options);
 }
 
 export function getUnreadCount(options) {

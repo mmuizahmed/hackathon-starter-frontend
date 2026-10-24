@@ -1,5 +1,5 @@
 import { Card, EmptyState, StatusPill } from "../../../components/ui";
-import { formatDay, formatTime, titleCase } from "../../../lib/format";
+import { formatDate, formatTime, sourceLabel } from "../../../lib/format";
 
 export function DayDetail({ day }) {
   if (!day) {
@@ -11,7 +11,7 @@ export function DayDetail({ day }) {
   }
 
   return (
-    <Card title={formatDay(day.date)}>
+    <Card title={formatDate(day.date)}>
       <div className="flex flex-wrap items-center gap-2">
         {day.status ? <StatusPill status={day.status} /> : <p className="text-sm text-zinc-500">No status</p>}
         {day.late && day.status !== "late" ? <StatusPill status="late" /> : null}
@@ -31,7 +31,7 @@ export function DayDetail({ day }) {
         </div>
         <div className="flex justify-between gap-3">
           <dt className="text-zinc-500 dark:text-zinc-400">Source</dt>
-          <dd className="text-zinc-950 dark:text-zinc-50">{day.source ? titleCase(day.source) : "—"}</dd>
+          <dd className="text-zinc-950 dark:text-zinc-50">{sourceLabel(day.source)}</dd>
         </div>
       </dl>
     </Card>

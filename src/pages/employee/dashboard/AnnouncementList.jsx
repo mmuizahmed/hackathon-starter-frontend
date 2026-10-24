@@ -1,5 +1,5 @@
 import { Card, EmptyState, ErrorState } from "../../../components/ui";
-import { formatDay } from "../../../lib/format";
+import { formatDate } from "../../../lib/format";
 
 export function AnnouncementList({ items = [], error, onRetry }) {
   return (
@@ -15,7 +15,7 @@ export function AnnouncementList({ items = [], error, onRetry }) {
               <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">{item.title}</p>
               <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{item.body}</p>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                {item.createdBy?.name || "Company"} · {formatDay(item.createdAt)}
+                {item.createdBy?.name || "Company"} · {formatDate(item.createdAt)}
               </p>
             </li>
           ))}

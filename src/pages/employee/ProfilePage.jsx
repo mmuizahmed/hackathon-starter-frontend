@@ -3,7 +3,7 @@ import { Badge, Button, Card, ErrorState, FormAlert, Input, PageHeader, Spinner 
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { getEmployee, updateEmployee } from "../../features/employees/api";
-import { formatDay, formatRupees, titleCase } from "../../lib/format";
+import { formatDate, formatRupees, titleCase } from "../../lib/format";
 
 function Row({ label, value }) {
   return (
@@ -91,7 +91,7 @@ export function EmployeeProfilePage() {
               <Row label="Email" value={record.email} />
               <Row label="Department" value={record.department?.name} />
               <Row label="Designation" value={record.designation?.name} />
-              <Row label="Joined" value={formatDay(record.joinDate)} />
+              <Row label="Joined" value={formatDate(record.joinDate)} />
               <Row label="Gender" value={titleCase(record.gender)} />
               <Row label="Basic salary" value={formatRupees(record.salary?.basic)} />
               <div className="flex items-center justify-between py-3">

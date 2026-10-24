@@ -1,6 +1,6 @@
 import { api } from "../../lib/api";
-import { toQuery } from "../../lib/query";
+import { withQuery } from "../../lib/query";
 
-export function listAnnouncements(params = {}, options) {
-  return api(`/announcements${toQuery(params)}`, options);
+export function listAnnouncements(query = {}, options) {
+  return api(withQuery("/announcements", query), options);
 }

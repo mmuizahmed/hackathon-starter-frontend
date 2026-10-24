@@ -15,11 +15,10 @@ import {
   Textarea,
 } from "../../components/ui";
 import { useToast } from "../../context/ToastContext";
-import { listLeaveTypes } from "../../features/organization/api";
-import { applyForLeave, cancelLeaveRequest, getLeaveBalances, listLeaveRequests } from "../../features/leave/api";
+import { applyForLeave, cancelLeaveRequest, getLeaveBalances, listLeaveRequests, listLeaveTypes } from "../../features/leave/api";
 import { canCancelLeave, countWeekdays } from "../../features/leave/rules";
 import { leaveTypeChoices } from "../../features/leave/typeOptions";
-import { formatDay, karachiToday } from "../../lib/format";
+import { formatDate, todayInKarachi } from "../../lib/format";
 import { LeaveBalanceList } from "./dashboard/LeaveBalanceList";
 import { SmartLeaveBox } from "./leave/SmartLeaveBox";
 
@@ -28,10 +27,9 @@ const EMPTY_FORM = { leaveTypeId: "", startDate: "", endDate: "", reason: "" };
 
 export function EmployeeLeavePage() {
   const toast = useToast();
-  const today = karachiToday();
+  const today = todayInKarachi();
   const [balances, setBalances] = useState([]);
   const [catalog, setCatalog] = useState([]);
-  const [catalogNote, setCatalogNote] = useState("");
   const [requests, setRequests] = useState(null);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
@@ -53,26 +51,17 @@ export function EmployeeLeavePage() {
     Promise.all([
       getLeaveBalances({}, { signal: controller.signal }),
       listLeaveRequests({ page, limit: LIMIT }, { signal: controller.signal }),
+      listLeaveTypes({ limit: 100 }, { signal: controller.signal }).catch((typeError) => {
+        if (typeError?.name === "AbortError") throw typeError;
+        return { items: [] };
+      }),
     ])
-      .then(async ([balancePage, requestPage]) => {
+      .then(([balancePage, requestPage, typePage]) => {
         if (!active) return;
         setBalances(balancePage?.items || []);
         setRequests(requestPage);
+        setCatalog(typePage?.items || []);
         setError("");
-        try {
-          const types = await listLeaveTypes({ limit: 100 }, { signal: controller.signal });
-          if (!active) return;
-          setCatalog(types?.items || []);
-          setCatalogNote("");
-        } catch (typeError) {
-          if (!active || typeError.name === "AbortError") return;
-          setCatalog([]);
-          if (typeError.status === 403) {
-            setCatalogNote("This login cannot read the leave type list, so a new request needs an id from an earlier request.");
-          } else {
-            setCatalogNote(typeError.message);
-          }
-        }
       })
       .catch((requestError) => {
         if (!active || requestError.name === "AbortError") return;
@@ -88,10 +77,7 @@ export function EmployeeLeavePage() {
     };
   }, [page, reloadKey]);
 
-  const choices = useMemo(
-    () => leaveTypeChoices({ balances, catalog, requests: requests?.items || [] }),
-    [balances, catalog, requests],
-  );
+  const choices = useMemo(() => leaveTypeChoices({ balances, catalog }), [balances, catalog]);
   const selectable = choices.filter((choice) => choice.id);
   const weekdays = countWeekdays(form.startDate, form.endDate);
 
@@ -109,8 +95,8 @@ export function EmployeeLeavePage() {
       reason: draft.reason,
     });
     setAiFilled(true);
-    setFormError(match?.id ? "" : `The assistant chose ${draft.code}, but there is no id for that leave type yet.`);
-    setFieldErrors({});
+    setFormError("");
+    setFieldErrors(match?.id ? {} : { leaveTypeId: "Choose a leave type." });
   }
 
   async function onSubmit(event) {
@@ -193,9 +179,6 @@ export function EmployeeLeavePage() {
                 </div>
               ) : null}
               <FormAlert message={formError} />
-              {selectable.length === 0 && catalogNote ? (
-                <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">{catalogNote}</p>
-              ) : null}
               <Select
                 name="leaveTypeId"
                 label="Type"
@@ -237,7 +220,7 @@ export function EmployeeLeavePage() {
                 required
                 onChange={(event) => update("reason", event.target.value)}
               />
-              <Button type="submit" loading={submitting} disabled={selectable.length === 0}>
+              <Button type="submit" loading={submitting}>
                 Submit request
               </Button>
             </form>
@@ -249,7 +232,7 @@ export function EmployeeLeavePage() {
               {
                 key: "dates",
                 header: "Dates",
-                render: (row) => `${formatDay(row.startDate)} – ${formatDay(row.endDate)}`,
+                render: (row) => `${formatDate(row.startDate)} – ${formatDate(row.endDate)}`,
               },
               { key: "days", header: "Working days", align: "right" },
               { key: "status", header: "Status", render: (row) => <StatusPill status={row.status} /> },

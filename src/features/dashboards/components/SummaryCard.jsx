@@ -19,16 +19,20 @@ export function SummaryCard({ summary, loading, error, onRetry }) {
 
   if (!summary) return null;
 
+  if (summary.fallback) {
+    return (
+      <Card title="Summary">
+        <Badge tone="blue">{summary.label || "AI-generated"}</Badge>
+        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">AI summary unavailable.</p>
+      </Card>
+    );
+  }
+
   const bullets = Array.isArray(summary.bullets) ? summary.bullets : [];
 
   return (
     <Card title="Summary">
       <Badge tone="blue">{summary.label || "AI-generated"}</Badge>
-      {summary.fallback ? (
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          The assistant was unavailable, so these lines repeat the figures currently on screen.
-        </p>
-      ) : null}
       {bullets.length === 0 ? (
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">The summary did not include any lines.</p>
       ) : (

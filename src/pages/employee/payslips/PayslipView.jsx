@@ -7,17 +7,6 @@ import { downloadPayslipPdf } from "../../../features/payroll/api";
 import { lineFormula, payslipShareText, splitPayslipLines, whatsAppHref } from "../../../features/payroll/payslipText";
 import { formatRupees } from "../../../lib/format";
 
-function saveFile(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
-
 function LineList({ lines }) {
   if (!lines.length) return <p className="text-sm text-zinc-500 dark:text-zinc-400">No lines.</p>;
   return (
@@ -54,8 +43,7 @@ export function PayslipView({ slip, loading, error, onRetry }) {
   async function onDownload() {
     setDownloading(true);
     try {
-      const file = await downloadPayslipPdf(slip.id);
-      saveFile(file.blob, file.filename || `payslip-${slip.month}.pdf`);
+      await downloadPayslipPdf(slip.id);
       toast.success("Payslip downloaded.");
     } catch (requestError) {
       toast.error(requestError.message);

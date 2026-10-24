@@ -72,6 +72,8 @@ These paths do **not** redirect on 401: `/setup/status`, `/setup`, `/auth/login`
 
 `api.js` does not import React. The event is how it talks to the router without a circular import.
 
+`apiBlob(path)` downloads a file. Payslip PDF is `application/pdf`, not the JSON envelope. It returns `{ blob, filename }` from the `Content-Disposition` header. Errors still throw `ApiError`. The payroll module calls it for `GET /api/payslips/:id/pdf` and starts a browser download. Do not point that button at the Render host. The cookie has to stay on this origin, so the path stays under `/api`.
+
 Example for a later screen:
 
 ```js
@@ -324,6 +326,30 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 
 Plot numbers the server returned for the current filters. Do not invent a series so the chart looks alive.
 
+## HR operations
+
+Attendance, corrections, leave approval, salary, and payroll live in `src/features/attendance`, `src/features/leave`, and `src/features/payroll`. Pages call only that module's `api.js`. Those files also read `/departments` and `/employees` when a screen has to filter or show a name the row does not include. Do not call `fetch` from a page.
+
+Admin can view attendance, corrections, leave, salary, and the payroll draft. HR approves corrections and leave, edits salary, and generates the draft. Only admin sees Finalize. A finalized month shows a Locked badge and hides Generate.
+
+| Screen | Page | What it calls |
+| --- | --- | --- |
+| Daily board | `pages/hr/AttendancePage.jsx`, `pages/admin/AttendancePage.jsx` | `GET /attendance/board`, then `GET /attendance/calendar` for one person |
+| Corrections | `pages/hr/CorrectionsPage.jsx`. Admin uses the Corrections tab on Attendance | `GET /attendance/corrections`, `POST /attendance/corrections/:id/review` |
+| Leave inbox | `pages/hr/LeaveApprovalsPage.jsx`, `pages/admin/LeavePage.jsx` | `GET /leave/requests`, `POST /leave/requests/:id/review` |
+| Salary | `pages/hr/SalaryStructuresPage.jsx`. Admin uses the Salary tab on Payroll | `GET /salary-structures`, `PUT /salary-structures/:employeeId` |
+| Payroll and payslips | `pages/hr/PayrollPage.jsx`, `pages/admin/PayrollPage.jsx` | `POST /payroll/runs`, `GET /payroll/runs/:id`, `GET /payroll/runs/:id/checks`, `POST /payroll/runs/:id/finalize`, `GET /payslips/:id/pdf` |
+
+`AttendanceCalendar` is `src/features/attendance/components/AttendanceCalendar.jsx`. It does not fetch. Pass `month` (`YYYY-MM`) and `days` (`{ date, status, workingDay, late }`). `onSelectDay` and `selectedDate` are optional. HR and Admin leave `selectedDate` empty. My Attendance sets it. The grid is built from the year and month in `src/features/attendance/calendar.js`, not from the browser's local midnight.
+
+Hours on the board are check-out minus check-in. The board payload does not include worked minutes. Salary preview uses the same rounding as the server: HRA 40% of basic, medical 10%, gross the sum (1.5× basic). The save request omits `allowances` so the server stores that standard structure. Paid days are employed working days minus absent days, unpaid leave, and half of the half-days.
+
+Leave rows are records rather than one wide table so the context stays visible on a phone: balance (`Casual 10 -> 8`), holidays, colleagues on leave, and this year's approved leave. Approve sends `{ decision: "approved" }` with no dialog. Reject requires a comment. Correction review requires a comment for both decisions, because the API rejects an empty one.
+
+Payroll checks link to salary, leave, and corrections. Finalize stays disabled while `checks.ok` is false. Override asks for a reason, then locks the month. The confirm copy says the month cannot be edited after that. The payslip drawer lists `breakdown.lines` with the formula inputs and the tax `slabLabel`.
+
+Shared helpers added for these screens: `src/lib/format.js` (Karachi dates and money), `src/lib/query.js` (`withQuery`, `collectPages`), and `src/hooks/useAbortableRequest.js` (the guide's abort pattern).
+
 ## Checks
 
 ```bash
@@ -332,9 +358,9 @@ npm test
 npm run build
 ```
 
-`npm test` covers the client envelope, 401 behaviour, user parsing, the setup JSON, Karachi formatting, leave weekday preview, payslip line text, assistant fallback copy, and dashboard date ranges. It does not open a browser.
+`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, the attendance month grid, leave weekday preview, leave context labels, payslip line text, salary math, assistant fallback copy, and dashboard date ranges. It does not open a browser.
 
-Payslip PDF is not JSON. `apiBlob()` in `src/lib/api.js` downloads it. Pages still call `downloadPayslipPdf` in `src/features/payroll/api.js`.
+Payslip PDF is not JSON. `apiBlob()` in `src/lib/api.js` returns the bytes. `downloadPayslipPdf` in `src/features/payroll/api.js` saves the file.
 
 ## Employee self-service, dashboards, assistant
 
@@ -350,11 +376,11 @@ These screens call the feature `api.js` files. They do not call `fetch`.
 | HR dashboard | `src/pages/hr/DashboardPage.jsx` | `GET /api/analytics/hr`, anomalies, and attrition risk. Filter changes refetch every widget. Absence flags and attrition risk are labeled rule-based. |
 | Admin dashboard | `src/pages/admin/DashboardPage.jsx` | `GET /api/analytics/admin`. The default range is 1 January through today so attrition is year to date. |
 | Assistant | `src/features/assistant/AssistantChat.jsx` | `POST /api/ai/chat`. Suggested questions depend on the role. Each model answer shows "AI-generated" and a Sources row from `sources`. |
-| Summarize | Both company dashboards | `POST /api/ai/summary` with the KPI JSON on screen and the current filters. |
+| Summarize | Both company dashboards | `POST /api/ai/summary` with the KPI JSON on screen and the current filters. A `fallback: true` response shows "AI summary unavailable" and hides the raw key bullets. |
 
-The month grid is `src/pages/employee/attendance/MonthCalendar.jsx`. It takes `month` and `days`. A shared `src/features/attendance/components/AttendanceCalendar.jsx` was not on main, so this copy stays with the employee screen.
+My Attendance uses the shared `AttendanceCalendar`. The employee page passes `selectedDate` so the open day stays marked. HR and Admin omit that prop. Month changes stay in the page, using `shiftMonth` from `calendar.js`.
 
-Leave apply needs `leaveTypeId`. Balances return the code and not the id, and `GET /api/leave-types` is Admin and HR only. The form uses an id from the catalog when the role can read it, or from one of this person's earlier requests. If neither exists, submit stays disabled and the page says so.
+Leave apply reads `leaveTypeId` from the balance. If that field is missing, the form uses `GET /api/leave-types`.
 
 The weekday count on the apply form skips Saturday and Sunday only. The server also skips holidays and is the count that gets saved.
 

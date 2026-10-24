@@ -1,10 +1,14 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { PageHeader } from "../../components/ui";
+import { CorrectionsInbox } from "../../features/attendance/components/CorrectionsInbox";
 
 export function HrCorrectionsPage() {
   return (
-    <PlaceholderPage
-      title="Corrections"
-      description="Approve or reject an attendance correction."
-    />
+    <div className="space-y-6">
+      <PageHeader
+        title="Corrections"
+        description="Compare the requested times with the recorded day. Approve or reject with a comment."
+      />
+      <CorrectionsInbox canReview />
+    </div>
   );
 }

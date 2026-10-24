@@ -1,12 +1,12 @@
-import { karachiToday } from "../../lib/format.js";
+import { todayInKarachi } from "../../lib/format.js";
 
 // Attrition on the admin board is year to date unless the person changes the range.
-export function defaultAdminRange(today = karachiToday()) {
+export function defaultAdminRange(today = todayInKarachi()) {
   return { from: `${today.slice(0, 4)}-01-01`, to: today, department: "" };
 }
 
 // HR looks at the current month. Today is the end so future days are not counted as absent.
-export function defaultHrRange(today = karachiToday()) {
+export function defaultHrRange(today = todayInKarachi()) {
   return { from: `${today.slice(0, 7)}-01`, to: today, department: "" };
 }
 
