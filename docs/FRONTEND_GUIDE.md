@@ -358,6 +358,6 @@ Leave apply needs `leaveTypeId`. Balances return the code and not the id, and `G
 
 The weekday count on the apply form skips Saturday and Sunday only. The server also skips holidays and is the count that gets saved.
 
-Charts use `recharts`. Axis and tooltip colors follow the light or dark class. An empty series uses `EmptyState` instead of a blank chart.
+Charts use `recharts`. Axis and tooltip colors follow the light or dark class. An empty series uses `EmptyState` instead of a blank chart. A trend that is 0% on every day still draws a marker for each day and says so.
 
 AI calls with no provider key return HTTP 200 and `fallback: true`. The panel shows that sentence. HTTP 429 shows "Too many AI requests. Try again in an hour." Smart leave fallback does not change the form.
