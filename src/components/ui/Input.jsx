@@ -1,41 +1,20 @@
-export function Input({
-  id,
-  name,
-  label,
-  hint,
-  error,
-  className = "",
-  ...props
-}) {
+import { Field, fieldDescribedBy } from "./Field";
+import { controlClasses } from "./styles";
+
+export function Input({ id, name, label, hint, error, className = "", required = false, ...props }) {
   const inputId = id || name;
 
   return (
-    <div>
-      {label ? (
-        <label
-          htmlFor={inputId}
-          className="mb-1 block text-sm font-medium text-stone-700"
-        >
-          {label}
-        </label>
-      ) : null}
+    <Field id={inputId} label={label} hint={hint} error={error}>
       <input
         id={inputId}
         name={name}
-        className={[
-          "w-full rounded-md border bg-white px-3 py-2 text-sm text-stone-900",
-          "placeholder:text-stone-400",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2",
-          error ? "border-red-500" : "border-stone-300",
-          className,
-        ].join(" ")}
+        required={required}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={fieldDescribedBy(inputId, { hint, error })}
+        className={controlClasses({ error, className })}
         {...props}
       />
-      {error ? (
-        <p className="mt-1 text-sm text-red-700">{error}</p>
-      ) : hint ? (
-        <p className="mt-1 text-sm text-stone-500">{hint}</p>
-      ) : null}
-    </div>
+    </Field>
   );
 }
