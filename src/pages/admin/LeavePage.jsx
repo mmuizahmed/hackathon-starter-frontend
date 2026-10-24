@@ -1,7 +1,14 @@
-import { PlaceholderPage } from "../shared/PlaceholderPage";
+import { PageHeader } from "../../components/ui";
+import { LeaveInbox } from "../../features/leave/components/LeaveInbox";
 
 export function AdminLeavePage() {
   return (
-    <PlaceholderPage title="Leave" description="Leave requests across the company." />
+    <div className="space-y-6">
+      <PageHeader
+        title="Leave"
+        description="Leave requests across the company, including balance, holidays, and colleagues. HR approves them."
+      />
+      <LeaveInbox canReview={false} />
+    </div>
   );
 }
