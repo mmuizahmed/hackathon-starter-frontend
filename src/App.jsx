@@ -1,8 +1,10 @@
 import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import { ToastProvider } from "./context/ToastContext";
 import { AppRoutes } from "./routes/AppRoutes";
 
 export function App() {
-  // Opt into the next React Router behavior so the console stays quiet.
   return (
     <BrowserRouter
       future={{
@@ -10,7 +12,13 @@ export function App() {
         v7_relativeSplatPath: true,
       }}
     >
-      <AppRoutes />
+      <ThemeProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </ToastProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
