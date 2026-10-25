@@ -119,6 +119,15 @@ export function LeaveTypesPanel() {
         total={list.total}
         onPageChange={list.setPage}
         caption="Leave types"
+        mobileRow={(row) => (
+          <div className="space-y-3 px-4 py-3">
+            <div className="flex items-start justify-between gap-3">
+              {columns[0].render(row)}
+              {columns[1].render(row)}
+            </div>
+            <QuotaCell key={`${row.id}-${row.updatedAt || ""}`} row={row} onSaved={list.refresh} />
+          </div>
+        )}
         emptyTitle="No leave types"
         emptyMessage="Leave types appear after company setup."
       />

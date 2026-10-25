@@ -1,6 +1,6 @@
 import { Banknote, TrendingDown, Users, Wallet } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button, Card, DataTable, ErrorState, FilterBar, PageHeader, Spinner, StatCard } from "../../components/ui";
+import { Button, Card, CodeChip, DataTable, ErrorState, FilterBar, PageHeader, Spinner, StatCard } from "../../components/ui";
 import { useTheme } from "../../context/ThemeContext";
 import { summarizeDashboard } from "../../features/assistant/api";
 import { assistantProblem } from "../../features/assistant/messages";
@@ -214,7 +214,7 @@ export function AdminDashboardPage() {
             <DataTable
               caption="Latest audit rows"
               columns={[
-                { key: "action", header: "Action" },
+                { key: "action", header: "Action", render: (row) => <CodeChip>{row.action}</CodeChip> },
                 { key: "entity", header: "Entity" },
                 { key: "actor", header: "Actor", render: (row) => row.actor?.name || "—" },
                 { key: "timestamp", header: "When", render: (row) => formatDateTime(row.timestamp) },
