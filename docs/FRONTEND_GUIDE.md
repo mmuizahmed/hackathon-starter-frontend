@@ -31,7 +31,7 @@ src/
 
 A page should not call `fetch`. It calls a function in `src/features/<module>/api.js`. That function calls `api()`.
 
-Modules: `auth`, `setup`, `organization`, `employees`, `attendance`, `leave`, `payroll`, `dashboards`, `assistant`, `announcements`, `audit`.
+Modules: `auth`, `setup`, `organization`, `employees`, `attendance`, `camera`, `leave`, `payroll`, `dashboards`, `assistant`, `announcements`, `audit`.
 
 ## Design system
 
@@ -388,11 +388,11 @@ These screens call the feature `api.js` files. They do not call `fetch`.
 
 | Screen | Page | What it reads and writes |
 | --- | --- | --- |
-| Employee dashboard | `src/pages/employee/DashboardPage.jsx` | `GET /api/analytics/me`, today's attendance, leave balances, announcements. Check-in and check-out. A 409 check-in shows "Already checked in today". |
+| Employee dashboard | `src/pages/employee/DashboardPage.jsx` | `GET /api/analytics/me`, today's attendance, leave balances, announcements. Check-in and check-out, including camera. A 409 check-in shows "Already checked in today". |
 | My Attendance | `src/pages/employee/AttendancePage.jsx` | Month calendar from `GET /api/attendance/calendar`, day detail, correction form, own corrections. |
 | My Leave | `src/pages/employee/LeavePage.jsx` | Balances with remaining and pending, apply, cancel, history. Smart leave calls `POST /api/ai/smart-leave` and only pre-fills the normal form. |
 | My Payslips | `src/pages/employee/PayslipsPage.jsx` | List by month, net pay, earnings and deduction lines with their inputs, tax slab, PDF, explain, and a `wa.me` link. |
-| My Profile | `src/pages/employee/ProfilePage.jsx` | Employee 360. Save sends only `phone` and `address`. |
+| My Profile | `src/pages/employee/ProfilePage.jsx` | Employee 360. Save sends only `phone` and `address`. Face enrollment is on this page. |
 | HR dashboard | `src/pages/hr/DashboardPage.jsx` | `GET /api/analytics/hr`, anomalies, and attrition risk. Filter changes refetch every widget. Absence flags and attrition risk are labeled rule-based. |
 | Admin dashboard | `src/pages/admin/DashboardPage.jsx` | `GET /api/analytics/admin`. The default range is 1 January through today so attrition is year to date. |
 | Assistant | `src/features/assistant/AssistantChat.jsx` | `POST /api/ai/chat`. Suggested questions depend on the role. Each model answer shows "AI-generated" and is rendered as markdown. A collapsed row names the records it used, such as "Based on: Your leave balance", and is hidden when no tool ran. |
@@ -407,3 +407,21 @@ The weekday count on the apply form skips Saturday and Sunday only. The server a
 Charts use `recharts`. Axis and tooltip colors follow the light or dark class. An empty series uses `EmptyState` instead of a blank chart. A trend that is 0% on every day still draws a marker for each day and says so.
 
 AI calls with no provider key return HTTP 200 and `fallback: true`. The panel shows that sentence. HTTP 429 shows "Too many AI requests. Try again in an hour." Smart leave fallback does not change the form.
+
+## Camera attendance
+
+Camera check-in runs in the browser. The page never uploads a photo. It sends a face signature (an array of numbers), a blink flag, and the device location.
+
+`@vladmandic/human` loads through a dynamic `import()` the first time the camera opens, so it stays out of the main bundle. Model files come from the jsDelivr URL for the installed version:
+
+`https://cdn.jsdelivr.net/npm/@vladmandic/human@<version>/models/`
+
+The running set is the face detector, face mesh, iris, and the FaceRes description model (`human-faceres`). Emotion, body, hand, and object models stay off. Gesture stays on, because that is how a blink is read (`blink left eye` and `blink right eye` from the mesh). WebGL is the backend. WASM is used when WebGL cannot start. The preview uses the front camera (`facingMode: "user"`). `useFaceCamera` stops those tracks when the view closes.
+
+The hook reports the face count, the descriptor, whether a blink happened, and a short status: loading models, no face, more than one face, hold still, please blink, blink detected.
+
+On the employee dashboard, camera check-in and camera check-out call the same attendance routes as the web buttons. The body is `source: "camera"`, `descriptor`, `liveness: { blink: true }`, `faceCount: 1`, `lat`, `lng`, and `accuracy`. The browser shows accuracy in meters and warns above 100 meters. The server decides. It compares descriptors with Human's `match.similarity` (Euclidean order 2, multiplier 25) and accepts 0.55 or higher. The page shows the returned status, `location.distanceMeters`, and `faceMatchScore`. A rejection is shown with the server's sentence, including "Enroll your face first", "Blink check failed", "Face does not match the enrolled face", "Face descriptor is required", and "Face descriptor length does not match the enrolled face". The link under the camera says "Can't check in? Request an HR correction" and opens My Attendance at the correction form.
+
+Enrollment is on My Profile. `GET /api/face/me` returns `{ enrolled, enrolledAt, model }`. With nobody enrolled that is `{ enrolled: false, enrolledAt: null, model: null }`. A new signature needs one face and a blink, then averages 3 to 5 descriptors and `POST /api/face/enroll` with `model: "human-faceres"`. A new enroll is 201 and returns `{ enrolled, enrolledAt, model }`. The notice on that card is "We store a face signature (numbers), not your photo". A second enroll is 409, "Face already enrolled. Ask HR to reset it." Camera check-out uses the same face, blink, and location checks as camera check-in, and it does not change the stored attendance source. HR and Admin see a Face enrolled badge on the employee record and can `DELETE /api/face/:employeeId` after a confirm. That delete returns `{ employeeId, enrolled: false }`.
+
+Files: `src/features/camera/`.
