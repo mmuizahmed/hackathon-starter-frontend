@@ -77,10 +77,14 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<SessionGate />}>
+        {/* The login page draws its own full-screen layout. */}
+        <Route element={<GuestOnly />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
+
         <Route element={<AuthLayout />}>
           <Route element={<GuestOnly />}>
             <Route path="/setup" element={<SetupPage />} />
-            <Route path="/login" element={<LoginPage />} />
           </Route>
           <Route element={<RequireAuth />}>
             <Route path="/change-password" element={<ChangePasswordPage />} />
