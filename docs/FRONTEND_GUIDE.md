@@ -261,6 +261,7 @@ Import from `src/components/ui`.
 | `Button` | Actions. `to` renders a link. | `variant`: `primary`, `secondary`, `danger`, `ghost`. `loading`, `disabled`, `type`. |
 | `IconButton` | Icon-only buttons. | `label` becomes the accessible name. |
 | `Input` | Text, email, password, number, time. | `name`, `label`, `hint`, `error`, `value`, `onChange`. |
+| `PasswordInput` | A password field with a show / hide eye button. | Same field props as `Input`. |
 | `Select` | A native select. | `options: [{ value, label }]`, `placeholder`, `error`. |
 | `Textarea` | Multi-line text. | Same field props as `Input`. |
 | `DatePicker` | A native `input type="date"`. | Same field props as `Input`. |
@@ -270,7 +271,7 @@ Import from `src/components/ui`.
 | `ErrorState` | A failed request. | `title`, `message`, `onRetry`. |
 | `Spinner` | A short wait that is not a table. | `label`. |
 | `Card` | A bordered section. | `title`, `actions`, `children`. |
-| `StatCard` | One KPI. Pass a real value, or do not render the card. | `label`, `value`, `hint`, optional `icon`. |
+| `StatCard` | One KPI. Pass a real value, or do not render the card. | `label`, `value`, `hint`, optional `icon`, optional `className` (for grid spans). |
 | `DataTable` | Server-paged lists. | See below. |
 | `FilterBar` | Date range plus department. | `from`, `to`, `department`, `departments`, `onChange`, `onClear`. |
 | `Modal` | A dialog. | `open`, `title`, `onClose`, `footer`, `children`. Escape and the backdrop close it. Focus stays inside. |
@@ -279,7 +280,7 @@ Import from `src/components/ui`.
 | `StatusPill` | A known status. | `status`: `present`, `late`, `half_day`, `absent`, `on_leave`, `missing_checkout`, `pending`, `approved`, `rejected`. |
 | `useToast()` | A short confirmation. Not a component. | `toast.success(message)`, `toast.error(message)`, `toast.info(message)`. |
 
-`DataTable` columns are `{ key, header, render(row)?, align?: "right", wrap?: true }`.
+`DataTable` columns are `{ key, header, render(row)?, align?: "right", wrap?: true }`. `minWidth` (default `36rem`) sets when the table starts to scroll sideways; pass `"0"` for a narrow table inside a side column.
 
 ```jsx
 <DataTable
@@ -301,6 +302,8 @@ Import from `src/components/ui`.
 />
 ```
 
+On a phone (below the `sm` breakpoint) each row becomes a small card: the first column is the title, the other columns are label / value pairs, and columns with no header or the header `Actions` go at the bottom. Put the column that names the row first.
+
 While `loading` is true the body is a skeleton. While `error` is set the table is replaced by `ErrorState`. Zero rows shows `EmptyState`. The footer says "Showing 1–20 of 45" and moves `page` by 1. The parent owns the fetch.
 
 `FilterBar` calls `onChange({ from, to, department })`. `departments` is `{ value, label }[]` from the API, not a hard-coded list. An empty array still shows "All departments".
@@ -314,7 +317,7 @@ While `loading` is true the body is a skeleton. While `error` is set the table i
 - Main column, max width `72rem`.
 - Assistant panel, 380px on a desktop and a full-screen sheet on a phone. It stays mounted while closed so the chat remains in component state. The employee dashboard opens it with the `hcm:open-assistant` window event.
 
-`AuthLayout` is the frame for setup, sign in, and change password. No sidebar.
+`AuthLayout` is the frame for setup and change password: the `AuthBrand` logo block above one centered card, and the theme button in the corner. No sidebar. The sign-in page draws the same frame itself, using `AuthBrand` and `authCardClass` from `components/layout/AuthBrand.jsx`.
 
 The notification menu polls `GET /api/notifications/unread-count` every 60 seconds. Opening it loads `GET /api/notifications`. Mark read and mark all read call the matching POST routes. There is no websocket.
 

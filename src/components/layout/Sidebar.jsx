@@ -62,7 +62,7 @@ export function Sidebar({ open, onClose }) {
                     "flex items-start gap-2 rounded-control px-2 py-2 text-sm font-medium",
                     focusRing,
                     isActive
-                      ? "bg-zinc-100 text-zinc-950 dark:bg-zinc-800 dark:text-zinc-50"
+                      ? "bg-brand-50 text-brand-800 dark:bg-zinc-800 dark:text-zinc-50"
                       : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-800/70 dark:hover:text-zinc-50",
                   )
                 }
@@ -70,7 +70,7 @@ export function Sidebar({ open, onClose }) {
                 {({ isActive }) => (
                   <>
                     <Icon
-                      className={cn("mt-0.5 h-4 w-4 shrink-0", isActive ? "text-brand-700 dark:text-brand-200" : "text-zinc-400")}
+                      className={cn("mt-0.5 h-4 w-4 shrink-0", isActive ? "text-brand-700 dark:text-brand-200" : "text-zinc-400 dark:text-zinc-500")}
                       aria-hidden="true"
                     />
                     <span className="leading-5">{item.label}</span>

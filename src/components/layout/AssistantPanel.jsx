@@ -20,7 +20,7 @@ export function AssistantPanel({ open, onClose }) {
         hidden={!open}
         className={
           open
-            ? "fixed inset-y-0 right-0 z-40 flex w-full max-w-[380px] flex-col border-l border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 md:static md:z-auto md:w-[380px] md:max-w-none"
+            ? "fixed inset-y-0 right-0 z-40 flex w-full flex-col sm:max-w-[380px] border-l border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 md:static md:z-auto md:w-[380px] md:max-w-none"
             : "hidden"
         }
       >

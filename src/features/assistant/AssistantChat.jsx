@@ -136,9 +136,12 @@ export function AssistantChat() {
             }
           }}
         />
-        <Button type="submit" loading={sending} disabled={!draft.trim()}>
-          Send
-        </Button>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Enter sends. Shift + Enter adds a line.</p>
+          <Button type="submit" className="shrink-0" loading={sending} disabled={!draft.trim()}>
+            Send
+          </Button>
+        </div>
       </form>
     </div>
   );

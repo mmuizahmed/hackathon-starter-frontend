@@ -3,7 +3,7 @@ import { focusRing } from "../../components/ui/styles";
 
 export function ViewTabs({ label, value, options, onChange }) {
   return (
-    <div role="tablist" aria-label={label} className="flex flex-wrap gap-1">
+    <div role="tablist" aria-label={label} className="inline-flex flex-wrap gap-1 rounded-control bg-zinc-100 p-1 dark:bg-zinc-800/70">
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -14,11 +14,11 @@ export function ViewTabs({ label, value, options, onChange }) {
             aria-selected={selected}
             onClick={() => onChange(option.value)}
             className={cn(
-              "h-9 rounded-control px-3 text-sm font-medium",
+              "h-8 rounded-[4px] px-3 text-sm font-medium",
               focusRing,
               selected
-                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950"
-                : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+                ? "bg-white text-zinc-950 shadow-card dark:bg-zinc-950 dark:text-zinc-50"
+                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50",
             )}
           >
             {option.label}

@@ -2,14 +2,15 @@ import { Button } from "./Button";
 import { DatePicker } from "./DatePicker";
 import { Select } from "./Select";
 
+// Phones: From and To share a row, department and Clear share the next one.
 export function FilterBar({ from = "", to = "", department = "", departments = [], onChange, onClear }) {
   function update(partial) {
     onChange({ from, to, department, ...partial });
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-      <div className="w-full sm:w-44">
+    <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
+      <div className="min-w-0 sm:w-44">
         <DatePicker
           name="from"
           label="From"
@@ -17,10 +18,10 @@ export function FilterBar({ from = "", to = "", department = "", departments = [
           onChange={(event) => update({ from: event.target.value })}
         />
       </div>
-      <div className="w-full sm:w-44">
+      <div className="min-w-0 sm:w-44">
         <DatePicker name="to" label="To" value={to} onChange={(event) => update({ to: event.target.value })} />
       </div>
-      <div className="w-full sm:w-56">
+      <div className={onClear ? "min-w-0 sm:w-56" : "col-span-2 min-w-0 sm:w-56"}>
         <Select
           name="department"
           label="Department"
@@ -31,9 +32,11 @@ export function FilterBar({ from = "", to = "", department = "", departments = [
         />
       </div>
       {onClear ? (
-        <Button variant="secondary" onClick={onClear}>
-          Clear
-        </Button>
+        <div className="flex items-end">
+          <Button variant="secondary" className="w-full sm:w-auto" onClick={onClear}>
+            Clear
+          </Button>
+        </div>
       ) : null}
     </div>
   );
