@@ -1,5 +1,5 @@
-import { Card, EmptyState, ErrorState } from "../../../components/ui";
-import { formatDate } from "../../../lib/format";
+import { Card, EmptyState, ErrorState } from "../../components/ui";
+import { formatDate } from "../../lib/format";
 
 export function AnnouncementList({ items = [], error, onRetry }) {
   return (

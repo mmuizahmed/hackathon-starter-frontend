@@ -2,7 +2,7 @@
 
 This is the map of the HCM Lite React app. Read it before you add a screen. The code is plain JavaScript, not TypeScript.
 
-Judges start from an empty database. Do not put sample employees, fake totals, or lorem text in the UI. Empty states are the right UI when a list has no rows.
+A new install starts with an empty database. The UI never shows sample employees or made-up totals. A list with no rows shows an empty state.
 
 ## Folder structure
 
@@ -25,7 +25,7 @@ src/
   pages/admin/              Admin screens
   pages/hr/                 HR screens
   pages/employee/           Employee screens
-  pages/shared/             Setup, sign in, change password, 404, placeholders
+  pages/shared/             Setup, sign in, change password, 404
   features/<module>/api.js  Functions that call api() for that module
 ```
 
@@ -74,7 +74,7 @@ These paths do **not** redirect on 401: `/setup/status`, `/setup`, `/auth/login`
 
 `apiBlob(path)` downloads a file. Payslip PDF is `application/pdf`, not the JSON envelope. It returns `{ blob, filename }` from the `Content-Disposition` header. Errors still throw `ApiError`. The payroll module calls it for `GET /api/payslips/:id/pdf` and starts a browser download. Do not point that button at the Render host. The cookie has to stay on this origin, so the path stays under `/api`.
 
-Example for a later screen:
+Example:
 
 ```js
 import { api } from "../../lib/api";
@@ -83,8 +83,6 @@ export function listEmployees({ page = 1, limit = 20 } = {}, options) {
   return api(`/employees?page=${page}&limit=${limit}`, options);
 }
 ```
-
-Use the path your backend actually exposes. The line above is the shape, not a promise that `/employees` is final.
 
 ```js
 const data = await listEmployees({ page });
@@ -136,7 +134,7 @@ Change password calls `POST /api/auth/change-password` with `{ currentPassword, 
 2. Admin name, email, password.
 3. Office rules.
 
-Step 3 is pre-filled from the brief: start `09:00`, grace `15` minutes, half day under `5` hours, weekend Saturday and Sunday, radius `150` meters. **Use my current location** calls the browser Geolocation API and fills latitude and longitude. Coordinates are optional so a blocked prompt does not trap the judge. They can be set later on Company Settings.
+Step 3 is pre-filled with defaults: start `09:00`, grace `15` minutes, half day under `5` hours, weekend Saturday and Sunday, radius `150` meters. **Use my current location** calls the browser Geolocation API and fills latitude and longitude. Coordinates are optional, so a blocked location prompt does not stop setup. They can be set later on Company Settings.
 
 Submit sends:
 
@@ -162,11 +160,9 @@ Submit sends:
 
 A successful setup stores the returned user and opens the admin dashboard. The same cookie path as login is used.
 
-## How to replace a placeholder
+## Page pattern
 
-The menu routes already exist. Open the page file and replace the body. Do not add another route for a screen that is already in the menu.
-
-Example: HR employees is `src/pages/hr/EmployeesPage.jsx`. Keep the export name `HrEmployeesPage`.
+Most list pages load data the same way. This is a simplified version of `src/pages/hr/EmployeesPage.jsx`:
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -338,13 +334,7 @@ The header moon / sun button calls `toggleTheme`. The choice is stored under `hc
 
 ## Charts
 
-`recharts` 3 is a dependency. Do not add another chart library. Import it when a dashboard is built:
-
-```jsx
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-```
-
-Plot numbers the server returned for the current filters. Do not invent a series so the chart looks alive.
+Dashboards use `recharts` 3. The wrappers are `CategoryChart` and `TrendChart` in `src/features/dashboards/components/`. They only plot numbers the server returned for the current filters.
 
 ## HR operations
 
@@ -368,7 +358,7 @@ Leave rows are records rather than one wide table so the context stays visible o
 
 Payroll checks link to salary, leave, and corrections. Finalize stays disabled while `checks.ok` is false. Override asks for a reason, then locks the month. The confirm copy says the month cannot be edited after that. The payslip drawer lists `breakdown.lines` with the formula inputs and the tax `slabLabel`.
 
-Shared helpers added for these screens: `src/lib/format.js` (Karachi dates and money), `src/lib/query.js` (`withQuery`, `collectPages`), and `src/hooks/useAbortableRequest.js` (the guide's abort pattern).
+Shared helpers: `src/lib/format.js` (Karachi dates and money), `src/lib/query.js` (`withQuery`, `collectPages`), and `src/hooks/useAbortableRequest.js` (the guide's abort pattern).
 
 ## Checks
 
@@ -378,7 +368,7 @@ npm test
 npm run build
 ```
 
-`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, company settings, the attendance month grid, leave weekday preview, leave context labels, payslip line text, salary math, assistant fallback copy, and dashboard date ranges. It does not open a browser.
+`npm test` covers the client envelope, 401 behaviour, payslip downloads, user parsing, the setup JSON, Karachi dates, company settings, the attendance month grid, leave weekday preview, leave context labels, payslip line text, salary math, assistant fallback copy, dashboard date ranges, and the camera status logic. It does not open a browser.
 
 Payslip PDF is not JSON. `apiBlob()` in `src/lib/api.js` returns the bytes. `downloadPayslipPdf` in `src/features/payroll/api.js` saves the file.
 
@@ -393,8 +383,8 @@ These screens call the feature `api.js` files. They do not call `fetch`.
 | My Leave | `src/pages/employee/LeavePage.jsx` | Balances with remaining and pending, apply, cancel, history. Smart leave calls `POST /api/ai/smart-leave` and only pre-fills the normal form. |
 | My Payslips | `src/pages/employee/PayslipsPage.jsx` | List by month, net pay, earnings and deduction lines with their inputs, tax slab, PDF, explain, and a `wa.me` link. |
 | My Profile | `src/pages/employee/ProfilePage.jsx` | Employee 360. Save sends only `phone` and `address`. Face enrollment is on this page. |
-| HR dashboard | `src/pages/hr/DashboardPage.jsx` | `GET /api/analytics/hr`, anomalies, and attrition risk. Filter changes refetch every widget. Absence flags and attrition risk are labeled rule-based. |
-| Admin dashboard | `src/pages/admin/DashboardPage.jsx` | `GET /api/analytics/admin`. The default range is 1 January through today so attrition is year to date. |
+| HR dashboard | `src/pages/hr/DashboardPage.jsx` | `GET /api/analytics/hr`, anomalies, attrition risk, and the latest announcements. Filter changes refetch every widget. Absence flags and attrition risk are labeled rule-based. |
+| Admin dashboard | `src/pages/admin/DashboardPage.jsx` | `GET /api/analytics/admin` and the latest announcements. The default range is 1 January through today so attrition is year to date. |
 | Assistant | `src/features/assistant/AssistantChat.jsx` | `POST /api/ai/chat`. Suggested questions depend on the role. Each model answer shows "AI-generated" and is rendered as markdown. A collapsed row names the records it used, such as "Based on: Your leave balance", and is hidden when no tool ran. |
 | Summarize | Both company dashboards | `POST /api/ai/summary` with the KPI JSON on screen and the current filters. A `fallback: true` response shows "AI summary unavailable" and hides the raw key bullets. |
 
@@ -443,3 +433,7 @@ Build: JDK 21, Android SDK platform 36, `npm ci`, `npm run build`, `npx cap sync
 https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk
 
 Vercel deploys ignore the `android/` folder.
+
+## Install as a web app
+
+`public/manifest.webmanifest` plus the icons in `public/` let Chrome and Safari add HCM Lite to the home screen. It opens full screen like an app. There is no service worker, so the app still needs a connection.

@@ -6,7 +6,7 @@ export function OfficeStep({ form, errors, locating, locationMessage, onChange, 
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-        These match the brief and are already filled in. Change them only if this office is different.
+        Common defaults are filled in. Change them to match your office.
       </p>
       <Input
         name="officeStart"

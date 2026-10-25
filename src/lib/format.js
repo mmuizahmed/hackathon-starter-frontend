@@ -122,7 +122,7 @@ export function formatPercent(value) {
   return `${Number(value).toLocaleString("en-PK", { maximumFractionDigits: 2 })}%`;
 }
 
-// Payslip sentences in the brief include the currency word. The digits stay in formatMoney.
+// Payslip sentences include the currency word. The digits stay in formatMoney.
 export function formatRupees(value) {
   const amount = formatMoney(value);
   return amount === "—" ? amount : `Rs ${amount}`;

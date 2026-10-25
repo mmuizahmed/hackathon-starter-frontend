@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { lineFormula, payslipShareText, whatsAppHref } from "./payslipText.js";
 
-test("prints deduction inputs the way the brief describes them", () => {
+test("prints deduction inputs in plain words", () => {
   assert.equal(
     lineFormula({ label: "Absent deduction", days: 2, perDay: 6818.18, amount: 13636.36 }),
     "2 absent days x Rs 6,818.18",
