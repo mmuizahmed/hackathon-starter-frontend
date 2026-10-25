@@ -23,6 +23,35 @@ export function assistantProblem(error, data) {
   return "";
 }
 
+const TOOL_LABELS = {
+  get_headcount: "Headcount",
+  get_attendance_summary: "Attendance",
+  get_late_comers: "Late arrivals",
+  get_leave_summary: "Leave summary",
+  get_my_leave_balance: "Your leave balance",
+  get_payroll_summary: "Payroll",
+  search_employees: "Employee search",
+};
+
+// Unknown tools still read as words, not snake_case.
+export function toolLabel(tool) {
+  if (!tool) return "";
+  if (TOOL_LABELS[tool]) return TOOL_LABELS[tool];
+  const words = String(tool).replace(/^get_/, "").replaceAll("_", " ").trim();
+  if (!words) return "";
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+export function basedOnText(sources) {
+  const labels = [];
+  for (const source of sources || []) {
+    const label = toolLabel(source?.tool);
+    if (label && !labels.includes(label)) labels.push(label);
+  }
+  if (labels.length === 0) return "";
+  return `Based on: ${labels.join(", ")}`;
+}
+
 // Nothing is saved from this. The person still submits the normal leave form.
 export function smartLeaveDraft(data) {
   if (!data || data.fallback) return null;

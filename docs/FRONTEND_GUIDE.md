@@ -395,7 +395,7 @@ These screens call the feature `api.js` files. They do not call `fetch`.
 | My Profile | `src/pages/employee/ProfilePage.jsx` | Employee 360. Save sends only `phone` and `address`. |
 | HR dashboard | `src/pages/hr/DashboardPage.jsx` | `GET /api/analytics/hr`, anomalies, and attrition risk. Filter changes refetch every widget. Absence flags and attrition risk are labeled rule-based. |
 | Admin dashboard | `src/pages/admin/DashboardPage.jsx` | `GET /api/analytics/admin`. The default range is 1 January through today so attrition is year to date. |
-| Assistant | `src/features/assistant/AssistantChat.jsx` | `POST /api/ai/chat`. Suggested questions depend on the role. Each model answer shows "AI-generated" and a Sources row from `sources`. |
+| Assistant | `src/features/assistant/AssistantChat.jsx` | `POST /api/ai/chat`. Suggested questions depend on the role. Each model answer shows "AI-generated" and is rendered as markdown. A collapsed row names the records it used, such as "Based on: Your leave balance", and is hidden when no tool ran. |
 | Summarize | Both company dashboards | `POST /api/ai/summary` with the KPI JSON on screen and the current filters. A `fallback: true` response shows "AI summary unavailable" and hides the raw key bullets. |
 
 My Attendance uses the shared `AttendanceCalendar`. The employee page passes `selectedDate` so the open day stays marked. HR and Admin omit that prop. Month changes stay in the page, using `shiftMonth` from `calendar.js`.
