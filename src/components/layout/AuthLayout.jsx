@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import { BrandMark } from "../BrandMark";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function AuthLayout() {
@@ -12,7 +13,7 @@ export function AuthLayout() {
       </a>
       <header className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 bg-brand-700" aria-hidden="true" />
+          <BrandMark />
           <span className="text-sm font-semibold tracking-tight">HCM Lite</span>
         </div>
         <ThemeToggle />
