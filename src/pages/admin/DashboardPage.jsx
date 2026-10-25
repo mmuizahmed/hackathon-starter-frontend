@@ -5,6 +5,7 @@ import { summarizeDashboard } from "../../features/assistant/api";
 import { assistantProblem } from "../../features/assistant/messages";
 import { getAdminDashboard } from "../../features/dashboards/api";
 import { CategoryChart } from "../../features/dashboards/components/CategoryChart";
+import { LatestAnnouncements } from "../../features/announcements/LatestAnnouncements";
 import { SummaryCard } from "../../features/dashboards/components/SummaryCard";
 import { defaultAdminRange, filtersToQuery, isYearToDate } from "../../features/dashboards/ranges";
 import { listDepartmentOptions } from "../../features/organization/api";
@@ -201,6 +202,7 @@ export function AdminDashboardPage() {
               />
             </Card>
           </div>
+          <LatestAnnouncements />
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">Recent audit</h2>
             <DataTable

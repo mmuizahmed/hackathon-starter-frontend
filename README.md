@@ -1,96 +1,87 @@
 # HCM Lite
 
-Web app for Admin, HR, and Employee. This repository is the frontend. The API is a separate service. The browser always calls `/api` on the same origin, so the session can stay in an httpOnly cookie.
+Web app for HCM Lite, an HR system for one company with three roles: Admin, HR and Employee. It covers attendance with camera check-in, leave, payroll with payslips, dashboards and an AI assistant. This repository is the frontend. The API is in [hcm-lite-backend](https://github.com/mmuizahmed/hcm-lite-backend).
 
-A fresh install opens **Set up your company**. Create the company and the Admin account there. The app does not ship sample employees, attendance, or payroll.
+| | |
+| --- | --- |
+| Live app | https://hcm.muiz.pk |
+| Android APK | [HCM-Lite.apk](https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk) |
+| Backend repo | https://github.com/mmuizahmed/hcm-lite-backend |
 
-- Live app: https://hcm.muiz.pk
-- Android APK: [HCM-Lite.apk](https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk) (debug build, about 5 MB). It opens the live app and asks for camera and location access.
-- Backend repo: https://github.com/mmuizahmed/hcm-lite-backend
+A new install opens the **Set up your company** screen, where you create the company and the first Admin. There is no sample data.
+
+## Tech stack
+
+| Part | Choice |
+| --- | --- |
+| UI | React 18, Vite 6, React Router 6 |
+| Styling | Tailwind CSS 3, light and dark mode |
+| Charts | Recharts 3 |
+| Icons | lucide-react |
+| Face check | `@vladmandic/human` (runs in the browser) |
+| Android | Capacitor 8 |
+| Hosting | Vercel |
+
+## Features
+
+- **Setup and sign-in.** First-run setup, login, forced password change for new accounts, and menus and route guards per role.
+- **Admin.** Company settings, departments, designations, leave types, holidays, HR logins, payroll finalize, audit log, and a company dashboard with headcount, attrition, payroll cost, gender and tenure.
+- **HR.** Employee directory with CSV import and export, employee profile pages, daily attendance board, corrections, leave approvals, salary structures, payroll drafts, and an HR dashboard with attendance trend, absenteeism, late arrivals, absence flags and attrition risk.
+- **Employee.** Check-in by button or camera, attendance calendar, correction requests, leave with live balances, payslips with PDF download and an AI explanation, and a personal dashboard.
+- **Everyone.** Announcements, notifications, and an AI assistant panel. Every AI answer is labelled "AI-generated".
+- **Camera check-in.** The front camera checks for one face and a blink, and the browser reads GPS. Only a face descriptor (numbers) is sent to the server, never a photo. The server makes the final decision.
+- **Mobile.** Works at phone width. It can be installed from the browser as a web app, or used through the Android APK.
+
+## Done and not done
+
+Done: every screen for the three roles, dashboards with date and department filters, the AI assistant, camera check-in, dark mode, the installable web app, and the Android APK.
+
+Not done:
+
+- No offline mode. The app needs a connection.
+- Notifications refresh every 60 seconds instead of arriving instantly.
+- The APK is a debug build, not signed for the Play Store.
 
 ## Run locally
 
-1. Install [Node.js](https://nodejs.org/) 20 or newer.
-2. Install dependencies:
+Needs Node.js 20 or newer, with the [backend](https://github.com/mmuizahmed/hcm-lite-backend) running on port 5000.
 
 ```bash
 npm install
-```
-
-3. Start the API on port **5000**.
-4. Start this app:
-
-```bash
 npm run dev
 ```
 
-5. Open [http://localhost:5173](http://localhost:5173).
-
-There is no demo password. The first Admin is whoever you enter on the setup screen. HR accounts are created later from Users. An employee login is created when HR registers that person, and the temporary password must be changed on first sign-in.
-
-## Scripts
+Open http://localhost:5173. On an empty database you will see the setup screen. That is where the first Admin is created. The AI key is set on the backend, never here.
 
 | Script | What it does |
 | --- | --- |
-| `npm run dev` | Vite dev server. Proxies `/api` to `http://localhost:5000`. |
+| `npm run dev` | Dev server. Forwards `/api` to `http://localhost:5000`. |
 | `npm run build` | Production build in `dist/`. |
-| `npm run preview` | Serve that build locally. |
+| `npm run preview` | Serves the production build. |
 | `npm run lint` | ESLint. |
-| `npm test` | Tests for the API client, user parsing, and the setup payload. |
+| `npm test` | Unit tests for the API client, dates and money formatting, leave, payroll, dashboard ranges, the assistant and the camera logic. |
 
-## How `/api` is routed
+## How the API is reached
 
-The UI never calls `localhost:5000` or the hosted API host directly.
-
-- **Dev.** `vite.config.js` proxies `/api` to `http://localhost:5000`.
-- **Production.** `vercel.json` rewrites `/api/(.*)` to the Render API. The rewrite is listed before the SPA fallback so `/api` is not swallowed by `index.html`. Point that destination at the team's backend before you deploy.
-
-`src/lib/api.js` sends `credentials: "include"` on every call. Do not put a token in `localStorage`.
+The browser only calls `/api` on its own host. In development, Vite forwards it to port 5000. In production, `vercel.json` forwards it to the API on Render. Because of this, the login cookie is first-party and httpOnly, and no token is stored in `localStorage`.
 
 ## Android app
 
-The Android app is a shell. It does not contain a second copy of the screens. [Capacitor](https://capacitorjs.com/) opens the live site, [https://hcm.muiz.pk](https://hcm.muiz.pk), in a WebView. Sign-in uses the same cookie as the browser, because the page and `/api` are both on that host.
+The APK is a Capacitor shell that opens https://hcm.muiz.pk in a WebView, so it always runs the latest version of the site. It asks for camera and location access for check-in.
 
-On startup the app asks for the camera and for location, so check-in can use the front camera and GPS.
+GitHub Actions (`.github/workflows/android.yml`) builds the APK and replaces the `apk-latest` release whenever the Android project changes on `main`.
 
-Download the latest debug APK:
-
-https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk
-
-That file is replaced each time the Android workflow runs. The workflow runs on a push to `main` that changes the Android project, and when someone starts **Android APK** by hand from the Actions tab. The same file is also saved as a workflow artifact named `HCM-Lite.apk`.
-
-Build it locally:
-
-1. Install JDK 21 and the Android SDK (platform 36).
-2. `npm ci`
-3. `npm run build` creates `dist/`. Capacitor copies that folder in. The installed app still opens the live site.
-4. `npx cap sync android`
-5. `cd android && ./gradlew assembleDebug`
-
-The APK is `android/app/build/outputs/apk/debug/app-debug.apk`.
-
-The address the shell opens is `server.url` in `capacitor.config.ts`. It defaults to `https://hcm.muiz.pk`. Change it, then sync again:
+To build it locally, install JDK 21 and Android SDK platform 36, then run:
 
 ```bash
-CAPACITOR_SERVER_URL=https://hackathon-starter-frontend-eight.vercel.app npx cap sync android
+npm ci
+npm run build
+npx cap sync android
+cd android && ./gradlew assembleDebug
 ```
 
-`hcm.muiz.pk` and `hackathon-starter-frontend-eight.vercel.app` are both listed under `allowNavigation`, so either host can open inside the app. `webDir` stays `dist`, so a later build can remove `server.url` and open the bundled files instead.
+The file is written to `android/app/build/outputs/apk/debug/app-debug.apk`. To point the app at another address, set `CAPACITOR_SERVER_URL` before `npx cap sync android`.
 
-## Charts
+## Code guide
 
-`recharts` 3 is installed for the dashboards (brief module 7). Those screens are still placeholders. When you build them, import charts from `recharts` inside `src/features/dashboards` or the dashboard page. The server computes the numbers. The chart only draws them.
-
-## For the team
-
-Read [docs/FRONTEND_GUIDE.md](docs/FRONTEND_GUIDE.md) before adding a screen. It covers folders, the route guards, the API client, and the shared components.
-
-## What is built
-
-- First-run setup, sign in, log out, change password
-- Menus and route guards for Admin, HR, and Employee
-- Shared layout: sidebar, header, notifications placeholder, assistant panel
-- Shared UI kit and light / dark mode
-- Placeholder pages for the rest of the menu
-
-Not built yet: organization setup screens, employees, attendance, leave, payroll, dashboards, the assistant, announcements, and the audit log.
+[docs/FRONTEND_GUIDE.md](docs/FRONTEND_GUIDE.md) explains the folders, the API client, the route guards, the shared components and each feature.

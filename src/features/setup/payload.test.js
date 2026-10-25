@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DEFAULT_OFFICE_SETTINGS, buildSetupPayload } from "./payload.js";
 
-test("default office rules match the brief", () => {
+test("default office rules use the standard values", () => {
   assert.equal(DEFAULT_OFFICE_SETTINGS.officeStart, "09:00");
   assert.equal(DEFAULT_OFFICE_SETTINGS.graceMinutes, "15");
   assert.equal(DEFAULT_OFFICE_SETTINGS.halfDayHours, "5");

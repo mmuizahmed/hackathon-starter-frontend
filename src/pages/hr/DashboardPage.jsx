@@ -5,6 +5,7 @@ import { summarizeDashboard } from "../../features/assistant/api";
 import { assistantProblem } from "../../features/assistant/messages";
 import { getAbsenceAnomalies, getAttritionRisk, getHrDashboard } from "../../features/dashboards/api";
 import { CategoryChart } from "../../features/dashboards/components/CategoryChart";
+import { LatestAnnouncements } from "../../features/announcements/LatestAnnouncements";
 import { SummaryCard } from "../../features/dashboards/components/SummaryCard";
 import { TrendChart } from "../../features/dashboards/components/TrendChart";
 import { defaultHrRange, filtersToQuery } from "../../features/dashboards/ranges";
@@ -215,6 +216,7 @@ export function HrDashboardPage() {
               />
             </Card>
           </div>
+          <LatestAnnouncements />
           {insightError ? <ErrorState title="Could not load insight lists" message={insightError} onRetry={() => setFilters({ ...filters })} /> : null}
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             <Card

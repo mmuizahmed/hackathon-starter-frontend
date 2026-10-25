@@ -6,7 +6,7 @@ import { listAttendance } from "../../features/attendance/api";
 import { getMyDashboard } from "../../features/dashboards/api";
 import { getLeaveBalances } from "../../features/leave/api";
 import { todayInKarachi } from "../../lib/format";
-import { AnnouncementList } from "./dashboard/AnnouncementList";
+import { AnnouncementList } from "../../features/announcements/AnnouncementList";
 import { CheckInWidget } from "./dashboard/CheckInWidget";
 import { LastPayslipCard } from "./dashboard/LastPayslipCard";
 import { LeaveBalanceList } from "./dashboard/LeaveBalanceList";
