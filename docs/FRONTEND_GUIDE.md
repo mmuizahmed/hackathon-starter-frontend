@@ -407,3 +407,21 @@ The weekday count on the apply form skips Saturday and Sunday only. The server a
 Charts use `recharts`. Axis and tooltip colors follow the light or dark class. An empty series uses `EmptyState` instead of a blank chart. A trend that is 0% on every day still draws a marker for each day and says so.
 
 AI calls with no provider key return HTTP 200 and `fallback: true`. The panel shows that sentence. HTTP 429 shows "Too many AI requests. Try again in an hour." Smart leave fallback does not change the form.
+
+## Android app
+
+The Android app is not a second UI. It is a Capacitor shell that opens the live site in a WebView. The default address is `https://hcm.muiz.pk`, set as `server.url` in `capacitor.config.ts`. The scheme is `https`, and the app id is `pk.muiz.hcmlite`.
+
+Because the WebView's page is that site, login cookies stay on `hcm.muiz.pk`. Calls still go to `/api` on the same host, and that host proxies them to the API. The cookie never has to be sent to a different origin.
+
+`allowNavigation` lists both `hcm.muiz.pk` and `hackathon-starter-frontend-eight.vercel.app`, so a link to either host stays in the app. Point the shell somewhere else by setting `CAPACITOR_SERVER_URL` and running `npx cap sync android`. The value is copied into the Android project at sync time. `webDir` is `dist`. Removing `server.url` later would make the app open that bundle instead of the live site.
+
+The manifest allows internet, camera, and fine and coarse location. `MainActivity` asks for the camera and location when the app starts. A small WebView change then grants video capture, which is what `getUserMedia` needs for the front camera. Location uses `navigator.geolocation`; Capacitor allows that prompt once the Android location permission is granted.
+
+Icons and the splash are generated from `assets/logo.svg` (dark green `#0f3d2a`, two bars, orange swoosh) with `@capacitor/assets`. The status bar is that same dark green, with light icons.
+
+Build: JDK 21, Android SDK platform 36, `npm ci`, `npm run build`, `npx cap sync android`, then `cd android && ./gradlew assembleDebug`. GitHub Actions does those steps in `.github/workflows/android.yml` and publishes `HCM-Lite.apk` on the `apk-latest` release:
+
+https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk
+
+Vercel deploys ignore the `android/` folder.

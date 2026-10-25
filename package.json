@@ -11,6 +11,8 @@
     "test": "node --test src/lib/api.test.js src/lib/user.test.js src/lib/format.test.js src/lib/query.test.js src/features/setup/payload.test.js src/features/organization/settings.test.js src/features/attendance/messages.test.js src/features/attendance/calendar.test.js src/features/leave/rules.test.js src/features/leave/typeOptions.test.js src/features/leave/contextLabel.test.js src/features/payroll/payslipText.test.js src/features/payroll/payslipLines.test.js src/features/payroll/salaryMath.test.js src/features/assistant/messages.test.js src/features/dashboards/ranges.test.js"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
     "lucide-react": "^0.545.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -20,6 +22,8 @@
     "remark-breaks": "^4.0.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.3",
     "@eslint/js": "^9.36.0",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.21",
@@ -29,6 +33,7 @@
     "globals": "^16.4.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
     "vite": "^6.3.5"
   }
 }

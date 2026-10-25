@@ -1,0 +1,15 @@
+# The Android project is not part of the site deploy.
+android
+
+# Listed again so a Vercel upload still skips local install and build output.
+node_modules
+dist
+dist-ssr
+.DS_Store
+*.local
+.env
+.env.*
+!.env.example
+npm-debug.log*
+.idea
+.vscode
