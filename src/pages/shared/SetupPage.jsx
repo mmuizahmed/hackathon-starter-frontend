@@ -21,6 +21,13 @@ const STEP_TITLES = {
   3: "Office rules",
 };
 
+// Short names for the step tracker so all three fit on a phone.
+const STEP_LABELS = {
+  1: "Company",
+  2: "Admin",
+  3: "Office",
+};
+
 const FIELD_STEP = {
   companyName: 1,
   adminName: 2,
@@ -221,7 +228,7 @@ export function SetupPage() {
                 )}
               >
                 {done ? <Check className="h-3.5 w-3.5 shrink-0 text-brand-700 dark:text-brand-200" aria-hidden="true" /> : null}
-                {STEP_TITLES[number]}
+                {STEP_LABELS[number]}
               </p>
             </li>
           );
