@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../lib/cn";
 import { homePathForRole } from "../../routes/navigation";
+import { BrandMark } from "../BrandMark";
 import { IconButton } from "../ui/IconButton";
 import { focusRing } from "../ui/styles";
 import { NotificationMenu } from "./NotificationMenu";
@@ -36,8 +37,12 @@ export function Header({ menuOpen, onMenuToggle, assistantOpen, onAssistantToggl
       </IconButton>
       <Link
         to={home}
-        className={cn("rounded-control text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-50 md:hidden", focusRing)}
+        className={cn(
+          "flex items-center gap-2 rounded-control text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-50 md:hidden",
+          focusRing,
+        )}
       >
+        <BrandMark />
         HCM Lite
       </Link>
       <div className="ml-auto flex items-center gap-1">

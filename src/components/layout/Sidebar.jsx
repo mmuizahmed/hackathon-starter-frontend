@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../lib/cn";
 import { roleLabel } from "../../lib/user";
 import { roleNavigation } from "../../routes/navigation";
+import { BrandMark } from "../BrandMark";
 import { IconButton } from "../ui/IconButton";
 import { focusRing } from "../ui/styles";
 
@@ -38,7 +39,7 @@ export function Sidebar({ open, onClose }) {
         )}
       >
         <div className="flex h-14 items-center gap-2 border-b border-zinc-200 px-4 dark:border-zinc-800">
-          <span className="h-2.5 w-2.5 bg-brand-700" aria-hidden="true" />
+          <BrandMark />
           <span className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">HCM Lite</span>
           <IconButton className="ml-auto md:hidden" label="Close menu" onClick={onClose}>
             <X className="h-4 w-4" aria-hidden="true" />
