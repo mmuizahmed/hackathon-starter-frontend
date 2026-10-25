@@ -1,21 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { Badge, Button, EmptyState, Spinner, Textarea } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
+import { AiMarkdown } from "./AiMarkdown";
 import { sendChat } from "./api";
-import { SUGGESTED_QUESTIONS, assistantProblem } from "./messages";
+import { SUGGESTED_QUESTIONS, assistantProblem, basedOnText, toolLabel } from "./messages";
 
 function SourceList({ sources = [] }) {
-  if (!sources.length) return null;
+  const title = basedOnText(sources);
+  if (!title) return null;
+  const rows = sources.filter((source) => toolLabel(source?.tool));
+
   return (
     <details className="mt-2">
-      <summary className="cursor-pointer text-xs font-medium text-zinc-500 dark:text-zinc-400">Sources</summary>
-      <ul className="mt-2 space-y-2">
-        {sources.map((source, index) => (
-          <li key={`${source.tool}-${index}`} className="text-xs leading-5 text-zinc-600 dark:text-zinc-300">
-            <span className="font-medium text-zinc-800 dark:text-zinc-100">{source.tool || "tool"}</span>
-            <span className="mt-0.5 block font-mono break-all">{JSON.stringify(source.args || {})}</span>
-          </li>
-        ))}
+      <summary className="cursor-pointer text-xs font-medium text-zinc-500 dark:text-zinc-400">{title}</summary>
+      <ul className="mt-2 space-y-1">
+        {rows.map((source, index) => {
+          const label = toolLabel(source.tool);
+          const detail = source.resultSummary ? `${label}. ${source.resultSummary}` : label;
+          return (
+            <li key={`${source.tool}-${index}`} className="text-xs leading-5 text-zinc-600 dark:text-zinc-300">
+              {detail}
+            </li>
+          );
+        })}
       </ul>
     </details>
   );
@@ -95,7 +102,11 @@ export function AssistantChat() {
             }
           >
             {message.role === "assistant" && message.label ? <Badge tone="blue">{message.label}</Badge> : null}
-            <p className={`leading-6 ${message.label ? "mt-2" : ""}`}>{message.content}</p>
+            {message.role === "assistant" ? (
+              <AiMarkdown className={message.label ? "mt-2" : ""} text={message.content} />
+            ) : (
+              <p className="leading-6">{message.content}</p>
+            )}
             {message.role === "assistant" ? <SourceList sources={message.sources} /> : null}
           </div>
         ))}

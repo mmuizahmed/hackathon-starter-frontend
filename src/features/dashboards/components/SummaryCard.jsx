@@ -1,4 +1,5 @@
 import { Badge, Card, ErrorState, Spinner } from "../../../components/ui";
+import { AiMarkdown } from "../../assistant/AiMarkdown";
 
 export function SummaryCard({ summary, loading, error, onRetry }) {
   if (loading) {
@@ -36,9 +37,11 @@ export function SummaryCard({ summary, loading, error, onRetry }) {
       {bullets.length === 0 ? (
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">The summary did not include any lines.</p>
       ) : (
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-zinc-800 dark:text-zinc-200">
+        <ul className="mt-3 list-disc space-y-2 pl-5">
           {bullets.map((bullet, index) => (
-            <li key={`${index}-${bullet}`}>{bullet}</li>
+            <li key={`${index}-${bullet}`}>
+              <AiMarkdown text={bullet} />
+            </li>
           ))}
         </ul>
       )}

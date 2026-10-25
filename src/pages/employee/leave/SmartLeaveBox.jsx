@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Card, Textarea } from "../../../components/ui";
+import { AiMarkdown } from "../../../features/assistant/AiMarkdown";
 import { parseSmartLeave } from "../../../features/assistant/api";
 import { assistantProblem, smartLeaveDraft } from "../../../features/assistant/messages";
 
@@ -45,7 +46,7 @@ export function SmartLeaveBox({ onDraft }) {
           rows={3}
           onChange={(event) => setText(event.target.value)}
         />
-        {note ? <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">{note}</p> : null}
+        {note ? <AiMarkdown text={note} /> : null}
         <Button type="submit" variant="secondary" loading={loading}>
           Fill the form
         </Button>

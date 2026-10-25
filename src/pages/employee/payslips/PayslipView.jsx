@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Badge, Button, Card, EmptyState, ErrorState, Spinner } from "../../../components/ui";
 import { useToast } from "../../../context/ToastContext";
+import { AiMarkdown } from "../../../features/assistant/AiMarkdown";
 import { explainPayslip } from "../../../features/assistant/api";
 import { assistantProblem } from "../../../features/assistant/messages";
 import { downloadPayslipPdf } from "../../../features/payroll/api";
@@ -123,7 +124,7 @@ export function PayslipView({ slip, loading, error, onRetry }) {
         {explanation ? (
           <div className="mt-3">
             <Badge tone="blue">{explanation.label || "AI-generated"}</Badge>
-            <p className="mt-2 text-sm leading-6 text-zinc-800 dark:text-zinc-200">{explanationText}</p>
+            <AiMarkdown className="mt-2" text={explanationText} />
           </div>
         ) : null}
       </div>
