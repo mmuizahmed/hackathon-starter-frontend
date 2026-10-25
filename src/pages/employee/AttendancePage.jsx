@@ -122,7 +122,9 @@ export function EmployeeAttendancePage() {
           </Card>
           <div className="space-y-4">
             <DayDetail day={selected} />
-            <CorrectionForm today={today} initialDate={selected?.date || ""} onCreated={reload} />
+            <div id="request-correction" className="scroll-mt-6">
+              <CorrectionForm today={today} initialDate={selected?.date || ""} onCreated={reload} />
+            </div>
           </div>
         </div>
       ) : null}

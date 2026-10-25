@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Badge, Button, Card, ErrorState, FormAlert, Input, PageHeader, Spinner } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
+import { FaceEnrollCard } from "../../features/camera/FaceEnrollCard";
 import { getEmployee, updateEmployee } from "../../features/employees/api";
 import { formatDate, formatRupees, titleCase } from "../../lib/format";
 
@@ -120,6 +121,7 @@ export function EmployeeProfilePage() {
           </Card>
         </div>
       ) : null}
+      {record ? <FaceEnrollCard /> : null}
     </div>
   );
 }

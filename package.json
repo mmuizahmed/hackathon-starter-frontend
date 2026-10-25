@@ -8,11 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "node --test src/lib/api.test.js src/lib/user.test.js src/lib/format.test.js src/lib/query.test.js src/features/setup/payload.test.js src/features/organization/settings.test.js src/features/attendance/messages.test.js src/features/attendance/calendar.test.js src/features/leave/rules.test.js src/features/leave/typeOptions.test.js src/features/leave/contextLabel.test.js src/features/payroll/payslipText.test.js src/features/payroll/payslipLines.test.js src/features/payroll/salaryMath.test.js src/features/assistant/messages.test.js src/features/dashboards/ranges.test.js"
+    "test": "node --test src/lib/api.test.js src/lib/user.test.js src/lib/format.test.js src/lib/query.test.js src/features/setup/payload.test.js src/features/organization/settings.test.js src/features/attendance/messages.test.js src/features/attendance/calendar.test.js src/features/leave/rules.test.js src/features/leave/typeOptions.test.js src/features/leave/contextLabel.test.js src/features/payroll/payslipText.test.js src/features/payroll/payslipLines.test.js src/features/payroll/salaryMath.test.js src/features/assistant/messages.test.js src/features/dashboards/ranges.test.js src/features/camera/camera.test.js"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
     "@capacitor/core": "^8.5.3",
+    "@vladmandic/human": "^3.3.6",
     "lucide-react": "^0.545.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

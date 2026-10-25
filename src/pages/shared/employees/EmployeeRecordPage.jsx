@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Card, DataTable, EmptyState, ErrorState, PageHeader, Spinner, StatCard } from "../../../components/ui";
+import { Badge, Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, PageHeader, Spinner, StatCard } from "../../../components/ui";
+import { useToast } from "../../../context/ToastContext";
+import { resetFace } from "../../../features/camera/api";
 import { getEmployee } from "../../../features/employees/api";
 import { messageFrom } from "../../../lib/errors";
 import { formatDate, formatMoney } from "../../../lib/format";
@@ -17,9 +19,12 @@ function ProfileLine({ label, value }) {
 
 export function EmployeeRecordPage({ backTo }) {
   const { id } = useParams();
+  const toast = useToast();
   const [record, setRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const load = useCallback(() => {
     const controller = new AbortController();
@@ -40,6 +45,25 @@ export function EmployeeRecordPage({ backTo }) {
   useEffect(() => load(), [load]);
 
   const employee = record?.employee;
+
+  async function onResetFace() {
+    if (!employee?.id || resetting) return;
+    setResetting(true);
+    try {
+      const result = await resetFace(employee.id);
+      setRecord((current) => ({
+        ...current,
+        employee: { ...current.employee, faceEnrolled: result?.enrolled === true },
+      }));
+      setResetOpen(false);
+      toast.success("Face signature deleted.");
+    } catch (requestError) {
+      toast.error(requestError.message || "Could not reset the face signature.");
+    } finally {
+      setResetting(false);
+    }
+  }
+
   const attendance = record?.attendanceThisMonth;
   const balances = record?.leaveBalances;
   const payslip = record?.lastPayslip;
@@ -58,6 +82,14 @@ export function EmployeeRecordPage({ backTo }) {
           <Card title="Profile">
             <dl>
               <ProfileLine label="Status" value={<EmployeeStatus status={employee.status} />} />
+              <ProfileLine
+                label="Face"
+                value={
+                  <Badge tone={employee.faceEnrolled ? "green" : "neutral"}>
+                    {employee.faceEnrolled ? "Face enrolled" : "Not enrolled"}
+                  </Badge>
+                }
+              />
               <ProfileLine label="Department" value={employee.department?.name} />
               <ProfileLine label="Designation" value={employee.designation?.name} />
               <ProfileLine label="Joined" value={formatDate(employee.joinDate)} />
@@ -67,6 +99,13 @@ export function EmployeeRecordPage({ backTo }) {
               <ProfileLine label="Gender" value={employee.gender} />
               <ProfileLine label="Basic salary" value={formatMoney(employee.salary?.basic)} />
             </dl>
+            {employee.faceEnrolled ? (
+              <div className="pt-3">
+                <Button variant="danger" onClick={() => setResetOpen(true)}>
+                  Reset face
+                </Button>
+              </div>
+            ) : null}
           </Card>
           <section className="space-y-3">
             <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">Attendance this month</h2>
@@ -118,6 +157,16 @@ export function EmployeeRecordPage({ backTo }) {
           </Card>
         </>
       ) : null}
+      <ConfirmDialog
+        open={resetOpen}
+        title="Reset face?"
+        message="This deletes the stored face signature. The employee will need to enroll again before camera check-in."
+        confirmLabel="Reset face"
+        tone="danger"
+        loading={resetting}
+        onConfirm={onResetFace}
+        onCancel={() => setResetOpen(false)}
+      />
     </div>
   );
 }

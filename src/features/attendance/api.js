@@ -5,8 +5,8 @@ export function checkIn(body = { source: "web" }, options) {
   return api("/attendance/check-in", { method: "POST", body, ...options });
 }
 
-export function checkOut(options) {
-  return api("/attendance/check-out", { method: "POST", body: {}, ...options });
+export function checkOut(body = {}, options) {
+  return api("/attendance/check-out", { method: "POST", body, ...options });
 }
 
 export function getAttendanceBoard({ date, departmentId } = {}, options) {
