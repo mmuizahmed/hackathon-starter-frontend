@@ -109,21 +109,21 @@ export function NotificationMenu({ open, onToggle, onClose }) {
       {open ? (
         <div
           id="notification-panel"
-          className="absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-card border border-zinc-200 bg-white shadow-pop dark:border-zinc-700 dark:bg-zinc-900"
+          className="fixed inset-x-3 top-14 z-30 rounded-card border sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-96 border-zinc-200 bg-white shadow-pop dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div className="flex items-center justify-between gap-2 border-b border-zinc-200 px-3 py-2 dark:border-zinc-800">
             <p className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">Notifications</p>
-            <Button variant="ghost" onClick={markAll} disabled={count === 0 || acting}>
+            <Button variant="ghost" className="h-8 px-2" onClick={markAll} disabled={count === 0 || acting}>
               Mark all read
             </Button>
           </div>
-          <div className="max-h-96 overflow-y-auto p-3">
+          <div className="max-h-[70vh] overflow-y-auto p-2 sm:max-h-96">
             {loading ? <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading notifications</p> : null}
             {error ? <ErrorState title="Could not load notifications" message={error} /> : null}
             {!loading && !error && items.length === 0 ? (
               <EmptyState title="No notifications" message="Leave decisions and new payslips show up here." />
             ) : null}
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {items.map((item) => (
                 <li key={item.id}>
                   <button

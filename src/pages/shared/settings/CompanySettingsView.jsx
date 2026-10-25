@@ -116,7 +116,7 @@ export function CompanySettingsView({ readOnly = false }) {
       {loadError ? <ErrorState title="Could not load settings" message={loadError} onRetry={load} /> : null}
       {form ? (
         <form onSubmit={onSubmit} className="max-w-3xl space-y-4">
-          <Card title="Office rules">
+          <Card title="Company and office hours">
             <div className="space-y-4">
               <FormAlert message={formError} />
               <Input

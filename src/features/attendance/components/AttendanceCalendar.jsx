@@ -21,7 +21,7 @@ function DayCell({ date, day, today, selectedDate, onSelectDay }) {
   const lateToo = Boolean(day?.late) && status && status !== "late";
   const summary = [date, label || "No mark", lateToo ? "also late" : ""].filter(Boolean).join(", ");
   const className = cn(
-    "flex min-h-16 flex-col items-start rounded-control px-1.5 py-1 text-left",
+    "flex min-h-11 flex-col items-center rounded-control px-1 py-1 text-center sm:min-h-16 sm:items-start sm:px-1.5 sm:text-left",
     status
       ? CELL_TONE[status] || "bg-zinc-50 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
       : "bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-500",
@@ -31,8 +31,9 @@ function DayCell({ date, day, today, selectedDate, onSelectDay }) {
   const body = (
     <>
       <span className="text-xs font-medium tabular-nums">{dayNumber(date)}</span>
-      {label ? <span className="mt-1 text-[11px] leading-4">{label}</span> : null}
-      {lateToo ? <span className="text-[11px] leading-4">Late</span> : null}
+      {/* Phones show only the colour; the legend and the cell's aria-label carry the words. */}
+      {label ? <span className="mt-1 hidden text-[11px] leading-4 sm:block">{label}</span> : null}
+      {lateToo ? <span className="hidden text-[11px] leading-4 sm:block">Late</span> : null}
     </>
   );
 
