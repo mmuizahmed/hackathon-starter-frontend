@@ -6,7 +6,7 @@ import { explainPayslip } from "../../../features/assistant/api";
 import { assistantProblem } from "../../../features/assistant/messages";
 import { downloadPayslipPdf } from "../../../features/payroll/api";
 import { lineFormula, payslipShareText, splitPayslipLines, whatsAppHref } from "../../../features/payroll/payslipText";
-import { formatRupees } from "../../../lib/format";
+import { formatMonth, formatRupees } from "../../../lib/format";
 
 function LineList({ lines }) {
   if (!lines.length) return <p className="text-sm text-zinc-500 dark:text-zinc-400">No lines.</p>;
@@ -72,7 +72,7 @@ export function PayslipView({ slip, loading, error, onRetry }) {
 
   return (
     <Card
-      title={slip.month}
+      title={formatMonth(slip.month)}
       actions={
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" loading={downloading} onClick={onDownload}>

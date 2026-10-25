@@ -18,7 +18,7 @@ import { useToast } from "../../context/ToastContext";
 import { applyForLeave, cancelLeaveRequest, getLeaveBalances, listLeaveRequests, listLeaveTypes } from "../../features/leave/api";
 import { canCancelLeave, countWeekdays } from "../../features/leave/rules";
 import { leaveTypeChoices } from "../../features/leave/typeOptions";
-import { formatDate, todayInKarachi } from "../../lib/format";
+import { formatDateRange, todayInKarachi } from "../../lib/format";
 import { LeaveBalanceList } from "./dashboard/LeaveBalanceList";
 import { SmartLeaveBox } from "./leave/SmartLeaveBox";
 
@@ -166,65 +166,75 @@ export function EmployeeLeavePage() {
 
       {requests ? (
         <>
-          <LeaveBalanceList items={choices.length ? choices : balances} />
-          <SmartLeaveBox onDraft={applyDraft} />
-          <Card title="Apply">
-            <form className="space-y-4" onSubmit={onSubmit} noValidate>
-              {aiFilled ? (
-                <div className="rounded-control border border-brand-200 bg-brand-50 px-3 py-3 dark:border-brand-800 dark:bg-zinc-950">
-                  <Badge tone="blue">AI-filled, please review</Badge>
-                  <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-                    Check the type, dates, and reason. Nothing is saved until you submit this form.
-                  </p>
-                </div>
-              ) : null}
-              <FormAlert message={formError} />
-              <Select
-                name="leaveTypeId"
-                label="Type"
-                placeholder="Choose a type"
-                value={form.leaveTypeId}
-                error={fieldErrors.leaveTypeId}
-                options={selectable.map((choice) => ({ value: choice.id, label: choice.name }))}
-                required
-                onChange={(event) => update("leaveTypeId", event.target.value)}
-              />
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <DatePicker
-                  name="startDate"
-                  label="Start"
-                  value={form.startDate}
-                  error={fieldErrors.startDate}
-                  required
-                  onChange={(event) => update("startDate", event.target.value)}
-                />
-                <DatePicker
-                  name="endDate"
-                  label="End"
-                  value={form.endDate}
-                  error={fieldErrors.endDate}
-                  required
-                  onChange={(event) => update("endDate", event.target.value)}
-                />
-              </div>
-              {form.startDate && form.endDate ? (
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {weekdays} weekday{weekdays === 1 ? "" : "s"} in this range. The server also skips public holidays and stores that working-day count.
-                </p>
-              ) : null}
-              <Textarea
-                name="reason"
-                label="Reason"
-                value={form.reason}
-                error={fieldErrors.reason}
-                required
-                onChange={(event) => update("reason", event.target.value)}
-              />
-              <Button type="submit" loading={submitting}>
-                Submit request
-              </Button>
-            </form>
-          </Card>
+          {/* Wide screens: the form on the left, balances beside it. */}
+          <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+            <div className="lg:order-2">
+              <LeaveBalanceList items={choices.length ? choices : balances} />
+            </div>
+            <div className="space-y-4 lg:order-1 lg:col-span-2">
+              <SmartLeaveBox onDraft={applyDraft} />
+              <Card title="Apply for leave">
+                <form className="space-y-4" onSubmit={onSubmit} noValidate>
+                  {aiFilled ? (
+                    <div className="rounded-control border border-brand-200 bg-brand-50 px-3 py-3 dark:border-brand-800 dark:bg-zinc-950">
+                      <Badge tone="blue">AI-filled, please review</Badge>
+                      <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                        Check the type, dates, and reason. Nothing is saved until you submit this form.
+                      </p>
+                    </div>
+                  ) : null}
+                  <FormAlert message={formError} />
+                  <Select
+                    name="leaveTypeId"
+                    label="Type"
+                    placeholder="Choose a type"
+                    value={form.leaveTypeId}
+                    error={fieldErrors.leaveTypeId}
+                    options={selectable.map((choice) => ({ value: choice.id, label: choice.name }))}
+                    required
+                    onChange={(event) => update("leaveTypeId", event.target.value)}
+                  />
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <DatePicker
+                      name="startDate"
+                      label="Start"
+                      value={form.startDate}
+                      error={fieldErrors.startDate}
+                      required
+                      onChange={(event) => update("startDate", event.target.value)}
+                    />
+                    <DatePicker
+                      name="endDate"
+                      label="End"
+                      value={form.endDate}
+                      error={fieldErrors.endDate}
+                      required
+                      onChange={(event) => update("endDate", event.target.value)}
+                    />
+                  </div>
+                  {form.startDate && form.endDate ? (
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                      {weekdays} weekday{weekdays === 1 ? "" : "s"} in this range. The server also skips public holidays and stores that working-day count.
+                    </p>
+                  ) : null}
+                  <Textarea
+                    name="reason"
+                    label="Reason"
+                    value={form.reason}
+                    error={fieldErrors.reason}
+                    required
+                    onChange={(event) => update("reason", event.target.value)}
+                  />
+                  <div className="flex justify-end">
+                    <Button type="submit" loading={submitting} className="w-full sm:w-auto">
+                      Submit request
+                    </Button>
+                  </div>
+                </form>
+              </Card>
+            </div>
+          </div>
+          <h2 className="pt-2 text-sm font-semibold text-zinc-950 dark:text-zinc-50">My requests</h2>
           <DataTable
             caption="My leave requests"
             columns={[
@@ -232,7 +242,7 @@ export function EmployeeLeavePage() {
               {
                 key: "dates",
                 header: "Dates",
-                render: (row) => `${formatDate(row.startDate)} – ${formatDate(row.endDate)}`,
+                render: (row) => formatDateRange(row.startDate, row.endDate),
               },
               { key: "days", header: "Working days", align: "right" },
               { key: "status", header: "Status", render: (row) => <StatusPill status={row.status} /> },

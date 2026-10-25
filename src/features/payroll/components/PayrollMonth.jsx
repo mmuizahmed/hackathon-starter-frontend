@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Badge, Button, ConfirmDialog, DataTable, EmptyState, ErrorState, FormAlert, Modal, Spinner, StatCard, Textarea } from "../../../components/ui";
 import { useToast } from "../../../context/ToastContext";
@@ -175,7 +176,7 @@ export function PayrollMonth({ role, month, canGenerate, canFinalize }) {
             <StatCard label="Gross" value={formatMoney(run.totals?.gross)} />
             <StatCard label="Deductions" value={formatMoney(run.totals?.deductions)} />
             <StatCard label="Tax" value={formatMoney(run.totals?.tax)} />
-            <StatCard label="Net" value={formatMoney(run.totals?.net)} />
+            <StatCard className="col-span-2 sm:col-span-1" label="Net" value={formatMoney(run.totals?.net)} />
           </div>
           <ChecksPanel checks={checks} role={role} />
           <DataTable
@@ -211,11 +212,12 @@ export function PayrollMonth({ role, month, canGenerate, canFinalize }) {
                 key: "actions",
                 header: "Payslip",
                 render: (row) => (
-                  <div className="flex gap-2">
-                    <Button variant="secondary" onClick={() => setSlip({ ...row, month: run.month })}>
+                  <div className="flex gap-1">
+                    <Button variant="secondary" className="h-8" onClick={() => setSlip({ ...row, month: run.month })}>
                       Breakdown
                     </Button>
-                    <Button variant="ghost" onClick={() => download(row)} loading={downloadingId === row.id}>
+                    <Button variant="secondary" className="h-8" onClick={() => download(row)} loading={downloadingId === row.id}>
+                      {downloadingId === row.id ? null : <Download className="h-4 w-4" aria-hidden="true" />}
                       PDF
                     </Button>
                   </div>

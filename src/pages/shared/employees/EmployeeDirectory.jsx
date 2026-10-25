@@ -114,14 +114,16 @@ export function EmployeeDirectory({ mode, detailBase }) {
   }
 
   const columns = [
-    { key: "code", header: "Code" },
     {
       key: "name",
-      header: "Name",
+      header: "Employee",
       render: (row) => (
-        <Link className="font-medium text-brand-700 hover:underline dark:text-brand-200" to={`${detailBase}/${row.id}`}>
-          {row.name}
-        </Link>
+        <div>
+          <Link className="font-medium text-brand-700 hover:underline dark:text-brand-200" to={`${detailBase}/${row.id}`}>
+            {row.name}
+          </Link>
+          <p className="text-xs font-normal text-zinc-500 dark:text-zinc-400">{row.code}</p>
+        </div>
       ),
     },
     { key: "email", header: "Email" },
@@ -166,14 +168,16 @@ export function EmployeeDirectory({ mode, detailBase }) {
           ) : null
         }
       />
-      <form className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5" onSubmit={applyFilters}>
-        <Input
-          name="search"
-          label="Search"
-          placeholder="Name, code, or email"
-          value={draft.search}
-          onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))}
-        />
+      <form className="grid grid-cols-2 gap-3 lg:grid-cols-5" onSubmit={applyFilters}>
+        <div className="col-span-2 lg:col-span-1">
+          <Input
+            name="search"
+            label="Search"
+            placeholder="Name, code, or email"
+            value={draft.search}
+            onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))}
+          />
+        </div>
         <Select
           name="departmentId"
           label="Department"
@@ -196,8 +200,8 @@ export function EmployeeDirectory({ mode, detailBase }) {
           onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
         />
         <div className="flex items-end gap-2">
-          <Button type="submit">Apply</Button>
-          <Button type="button" variant="secondary" onClick={clearFilters}>Clear</Button>
+          <Button type="submit" className="flex-1 lg:flex-none">Apply</Button>
+          <Button type="button" variant="secondary" className="flex-1 lg:flex-none" onClick={clearFilters}>Clear</Button>
         </div>
       </form>
       <DataTable
