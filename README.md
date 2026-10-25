@@ -4,6 +4,10 @@ Web app for Admin, HR, and Employee. This repository is the frontend. The API is
 
 A fresh install opens **Set up your company**. Create the company and the Admin account there. The app does not ship sample employees, attendance, or payroll.
 
+- Live app: https://hcm.muiz.pk
+- Android APK: [HCM-Lite.apk](https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk) (debug build, about 5 MB). It opens the live app and asks for camera and location access.
+- Backend repo: https://github.com/mmuizahmed/hackathon-starter-backend
+
 ## Run locally
 
 1. Install [Node.js](https://nodejs.org/) 20 or newer.
