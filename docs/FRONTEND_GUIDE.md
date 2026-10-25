@@ -440,6 +440,6 @@ Icons and the splash are generated from `assets/logo.svg` (dark green `#0f3d2a`,
 
 Build: JDK 21, Android SDK platform 36, `npm ci`, `npm run build`, `npx cap sync android`, then `cd android && ./gradlew assembleDebug`. GitHub Actions does those steps in `.github/workflows/android.yml` and publishes `HCM-Lite.apk` on the `apk-latest` release:
 
-https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk
+https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk
 
 Vercel deploys ignore the `android/` folder.

@@ -5,8 +5,8 @@ Web app for Admin, HR, and Employee. This repository is the frontend. The API is
 A fresh install opens **Set up your company**. Create the company and the Admin account there. The app does not ship sample employees, attendance, or payroll.
 
 - Live app: https://hcm.muiz.pk
-- Android APK: [HCM-Lite.apk](https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk) (debug build, about 5 MB). It opens the live app and asks for camera and location access.
-- Backend repo: https://github.com/mmuizahmed/hackathon-starter-backend
+- Android APK: [HCM-Lite.apk](https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk) (debug build, about 5 MB). It opens the live app and asks for camera and location access.
+- Backend repo: https://github.com/mmuizahmed/hcm-lite-backend
 
 ## Run locally
 
@@ -55,7 +55,7 @@ On startup the app asks for the camera and for location, so check-in can use the
 
 Download the latest debug APK:
 
-https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk
+https://github.com/mmuizahmed/hcm-lite-frontend/releases/download/apk-latest/HCM-Lite.apk
 
 That file is replaced each time the Android workflow runs. The workflow runs on a push to `main` that changes the Android project, and when someone starts **Android APK** by hand from the Actions tab. The same file is also saved as a workflow artifact named `HCM-Lite.apk`.
 
