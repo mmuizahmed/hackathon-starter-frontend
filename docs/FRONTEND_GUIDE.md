@@ -276,11 +276,16 @@ Import from `src/components/ui`.
 | `FilterBar` | Date range plus department. | `from`, `to`, `department`, `departments`, `onChange`, `onClear`. |
 | `Modal` | A dialog. | `open`, `title`, `onClose`, `footer`, `children`. Escape and the backdrop close it. Focus stays inside. |
 | `ConfirmDialog` | A yes / no modal. | `open`, `title`, `message`, `confirmLabel`, `tone` (`danger` or `primary`), `loading`, `onConfirm`, `onCancel`. |
+| `CodeChip` | A short machine code, such as an audit action. | `children`. |
 | `Badge` | A small label. | `tone`: `neutral`, `green`, `amber`, `orange`, `red`, `blue`, `yellow`. |
 | `StatusPill` | A known status. | `status`: `present`, `late`, `half_day`, `absent`, `on_leave`, `missing_checkout`, `pending`, `approved`, `rejected`. |
 | `useToast()` | A short confirmation. Not a component. | `toast.success(message)`, `toast.error(message)`, `toast.info(message)`. |
 
 `DataTable` columns are `{ key, header, render(row)?, align?: "right", wrap?: true }`. `minWidth` (default `36rem`) sets when the table starts to scroll sideways; pass `"0"` for a narrow table inside a side column.
+
+On phones (below `sm`, 640px) the table is replaced by one card per row, with each column as a label and value. Only one of the two layouts is in the page at a time, so inputs inside rows keep unique ids. For lists people mostly use to open a record, pass `mobileRow(row)` to draw a compact row instead, for example the employee directory (name and code link to Employee 360) or the users list. Keep the default cards for rows with many numbers, such as payroll and attendance.
+
+The footer shows "Showing x–y of n". Previous and Next only appear when there is more than one page.
 
 ```jsx
 <DataTable
