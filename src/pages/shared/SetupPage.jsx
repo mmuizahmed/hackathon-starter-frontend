@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { Check } from "lucide-react";
 import { Button, FormAlert } from "../../components/ui";
+import { authCardClass } from "../../components/layout/AuthBrand";
+import { cn } from "../../lib/cn";
 import { DEFAULT_OFFICE_SETTINGS, buildSetupPayload } from "../../features/setup/payload";
 import { readCurrentPosition } from "../../lib/geo";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
@@ -202,17 +205,37 @@ export function SetupPage() {
   }
 
   return (
-    <div className="rounded-card border border-zinc-200 bg-white p-4 shadow-card dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Step {step} of 3</p>
-      <h1 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">{STEP_TITLES[step]}</h1>
+    <div className={authCardClass}>
+      {/* Step tracker: done steps get a check, the current step is filled. */}
+      <ol className="grid grid-cols-3 gap-2" aria-label="Setup steps">
+        {[1, 2, 3].map((number) => {
+          const done = number < step;
+          const current = number === step;
+          return (
+            <li key={number} aria-current={current ? "step" : undefined} className="min-w-0">
+              <div className={cn("h-1 rounded-full", number <= step ? "bg-brand-700" : "bg-zinc-200 dark:bg-zinc-800")} />
+              <p
+                className={cn(
+                  "mt-2 flex items-center gap-1 truncate text-xs font-medium",
+                  current ? "text-zinc-950 dark:text-zinc-50" : "text-zinc-500 dark:text-zinc-400",
+                )}
+              >
+                {done ? <Check className="h-3.5 w-3.5 shrink-0 text-brand-700 dark:text-brand-200" aria-hidden="true" /> : null}
+                {STEP_TITLES[number]}
+              </p>
+            </li>
+          );
+        })}
+      </ol>
+      <h1 className="mt-6 text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+        <span className="sr-only">Step {step} of 3: </span>
+        {STEP_TITLES[step]}
+      </h1>
       <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
         {step === 1 ? "Name the company. You can invite HR after this." : null}
         {step === 2 ? "This person is the first Admin." : null}
         {step === 3 ? "Office hours decide who is late, and the map decides camera check-in." : null}
       </p>
-      <div className="mt-4 h-1 bg-zinc-100 dark:bg-zinc-800" aria-hidden="true">
-        <div className="h-1 bg-brand-700" style={{ width: `${(step / 3) * 100}%` }} />
-      </div>
 
       <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate aria-busy={submitting || undefined}>
         <FormAlert message={formError} />

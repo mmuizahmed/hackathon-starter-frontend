@@ -1,4 +1,4 @@
-import { Input } from "../../../components/ui";
+import { Input, PasswordInput } from "../../../components/ui";
 import { MIN_PASSWORD_LENGTH } from "../../../lib/validate";
 
 export function AdminStep({ form, errors, onChange }) {
@@ -25,9 +25,8 @@ export function AdminStep({ form, errors, onChange }) {
         autoComplete="email"
         onChange={(event) => onChange("adminEmail", event.target.value)}
       />
-      <Input
+      <PasswordInput
         name="adminPassword"
-        type="password"
         label="Password"
         hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
         value={form.adminPassword}
@@ -37,9 +36,8 @@ export function AdminStep({ form, errors, onChange }) {
         autoComplete="new-password"
         onChange={(event) => onChange("adminPassword", event.target.value)}
       />
-      <Input
+      <PasswordInput
         name="confirmPassword"
-        type="password"
         label="Confirm password"
         value={form.confirmPassword}
         error={errors.confirmPassword}

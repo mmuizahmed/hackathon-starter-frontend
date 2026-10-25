@@ -12,7 +12,7 @@ export function WeekendPicker({ value = [], onToggle, error, disabled = false, h
         id="weekend"
         role="group"
         aria-labelledby="weekend-label"
-        className="flex flex-wrap gap-2"
+        className="grid max-w-md grid-cols-7 gap-1.5"
       >
         {WEEK_DAYS.map((day) => {
           const selected = value.includes(day.value);
@@ -23,10 +23,10 @@ export function WeekendPicker({ value = [], onToggle, error, disabled = false, h
               aria-pressed={selected}
               disabled={disabled}
               className={cn(
-                "h-9 rounded-control px-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60",
+                "h-9 rounded-control text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60",
                 focusRing,
                 selected
-                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  ? "border border-brand-700 bg-brand-700 text-white"
                   : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800",
               )}
               onClick={() => onToggle(day.value)}

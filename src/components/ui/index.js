@@ -11,6 +11,7 @@ export { FormAlert } from "./FormAlert";
 export { IconButton } from "./IconButton";
 export { Input } from "./Input";
 export { Modal } from "./Modal";
+export { PasswordInput } from "./PasswordInput";
 export { PageHeader } from "./PageHeader";
 export { Select } from "./Select";
 export { Spinner } from "./Spinner";
