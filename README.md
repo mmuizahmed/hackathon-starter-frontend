@@ -4,6 +4,10 @@ Web app for Admin, HR, and Employee. This repository is the frontend. The API is
 
 A fresh install opens **Set up your company**. Create the company and the Admin account there. The app does not ship sample employees, attendance, or payroll.
 
+- Live app: https://hcm.muiz.pk
+- Android APK: [HCM-Lite.apk](https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk) (debug build, about 5 MB). It opens the live app and asks for camera and location access.
+- Backend repo: https://github.com/mmuizahmed/hackathon-starter-backend
+
 ## Run locally
 
 1. Install [Node.js](https://nodejs.org/) 20 or newer.
@@ -42,6 +46,36 @@ The UI never calls `localhost:5000` or the hosted API host directly.
 - **Production.** `vercel.json` rewrites `/api/(.*)` to the Render API. The rewrite is listed before the SPA fallback so `/api` is not swallowed by `index.html`. Point that destination at the team's backend before you deploy.
 
 `src/lib/api.js` sends `credentials: "include"` on every call. Do not put a token in `localStorage`.
+
+## Android app
+
+The Android app is a shell. It does not contain a second copy of the screens. [Capacitor](https://capacitorjs.com/) opens the live site, [https://hcm.muiz.pk](https://hcm.muiz.pk), in a WebView. Sign-in uses the same cookie as the browser, because the page and `/api` are both on that host.
+
+On startup the app asks for the camera and for location, so check-in can use the front camera and GPS.
+
+Download the latest debug APK:
+
+https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk
+
+That file is replaced each time the Android workflow runs. The workflow runs on a push to `main` that changes the Android project, and when someone starts **Android APK** by hand from the Actions tab. The same file is also saved as a workflow artifact named `HCM-Lite.apk`.
+
+Build it locally:
+
+1. Install JDK 21 and the Android SDK (platform 36).
+2. `npm ci`
+3. `npm run build` creates `dist/`. Capacitor copies that folder in. The installed app still opens the live site.
+4. `npx cap sync android`
+5. `cd android && ./gradlew assembleDebug`
+
+The APK is `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+The address the shell opens is `server.url` in `capacitor.config.ts`. It defaults to `https://hcm.muiz.pk`. Change it, then sync again:
+
+```bash
+CAPACITOR_SERVER_URL=https://hackathon-starter-frontend-eight.vercel.app npx cap sync android
+```
+
+`hcm.muiz.pk` and `hackathon-starter-frontend-eight.vercel.app` are both listed under `allowNavigation`, so either host can open inside the app. `webDir` stays `dist`, so a later build can remove `server.url` and open the bundled files instead.
 
 ## Charts
 

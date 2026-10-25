@@ -1,0 +1,86 @@
+# Builds a debug APK of the Capacitor shell and publishes it.
+# The app opens the live site; this job only packages the shell.
+
+name: Android APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "android/**"
+      - "capacitor.config.ts"
+      - "assets/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build web assets
+        # cap sync copies dist/ into the Android project. The shell still opens
+        # the live site; dist is only the offline fallback (webDir).
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Assemble debug APK
+        working-directory: android
+        run: chmod +x ./gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Name the APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk HCM-Lite.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HCM-Lite.apk
+          path: HCM-Lite.apk
+          if-no-files-found: error
+
+      - name: Attach APK to the apk-latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          notes="Debug APK of the HCM Lite Android shell. It opens https://hcm.muiz.pk."
+          # Replace the previous apk-latest release so the download URL stays stable.
+          if gh release view apk-latest >/dev/null 2>&1; then
+            gh release delete apk-latest --yes --cleanup-tag
+          fi
+          gh release create apk-latest HCM-Lite.apk \
+            --title "HCM Lite Android" \
+            --notes "$notes" \
+            --latest=false \
+            --target "${GITHUB_SHA}"

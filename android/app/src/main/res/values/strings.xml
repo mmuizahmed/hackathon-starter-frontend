@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HCM Lite</string>
+    <string name="title_activity_main">HCM Lite</string>
+    <string name="package_name">pk.muiz.hcmlite</string>
+    <string name="custom_url_scheme">pk.muiz.hcmlite</string>
+</resources>

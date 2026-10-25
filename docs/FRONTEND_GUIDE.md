@@ -425,3 +425,21 @@ On the employee dashboard, camera check-in and camera check-out call the same at
 Enrollment is on My Profile. `GET /api/face/me` returns `{ enrolled, enrolledAt, model }`. With nobody enrolled that is `{ enrolled: false, enrolledAt: null, model: null }`. A new signature needs one face and a blink, then averages 3 to 5 descriptors and `POST /api/face/enroll` with `model: "human-faceres"`. A new enroll is 201 and returns `{ enrolled, enrolledAt, model }`. The notice on that card is "We store a face signature (numbers), not your photo". A second enroll is 409, "Face already enrolled. Ask HR to reset it." Camera check-out uses the same face, blink, and location checks as camera check-in, and it does not change the stored attendance source. HR and Admin see a Face enrolled badge on the employee record and can `DELETE /api/face/:employeeId` after a confirm. That delete returns `{ employeeId, enrolled: false }`.
 
 Files: `src/features/camera/`.
+
+## Android app
+
+The Android app is not a second UI. It is a Capacitor shell that opens the live site in a WebView. The default address is `https://hcm.muiz.pk`, set as `server.url` in `capacitor.config.ts`. The scheme is `https`, and the app id is `pk.muiz.hcmlite`.
+
+Because the WebView's page is that site, login cookies stay on `hcm.muiz.pk`. Calls still go to `/api` on the same host, and that host proxies them to the API. The cookie never has to be sent to a different origin.
+
+`allowNavigation` lists both `hcm.muiz.pk` and `hackathon-starter-frontend-eight.vercel.app`, so a link to either host stays in the app. Point the shell somewhere else by setting `CAPACITOR_SERVER_URL` and running `npx cap sync android`. The value is copied into the Android project at sync time. `webDir` is `dist`. Removing `server.url` later would make the app open that bundle instead of the live site.
+
+The manifest allows internet, camera, and fine and coarse location. `MainActivity` asks for the camera and location when the app starts. A small WebView change then grants video capture, which is what `getUserMedia` needs for the front camera. Location uses `navigator.geolocation`; Capacitor allows that prompt once the Android location permission is granted.
+
+Icons and the splash are generated from `assets/logo.svg` (dark green `#0f3d2a`, two bars, orange swoosh) with `@capacitor/assets`. The status bar is that same dark green, with light icons.
+
+Build: JDK 21, Android SDK platform 36, `npm ci`, `npm run build`, `npx cap sync android`, then `cd android && ./gradlew assembleDebug`. GitHub Actions does those steps in `.github/workflows/android.yml` and publishes `HCM-Lite.apk` on the `apk-latest` release:
+
+https://github.com/mmuizahmed/hackathon-starter-frontend/releases/download/apk-latest/HCM-Lite.apk
+
+Vercel deploys ignore the `android/` folder.
