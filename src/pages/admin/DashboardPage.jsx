@@ -1,3 +1,4 @@
+import { Banknote, TrendingDown, Users, Wallet } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, DataTable, ErrorState, FilterBar, PageHeader, Spinner, StatCard } from "../../components/ui";
 import { useTheme } from "../../context/ThemeContext";
@@ -9,7 +10,7 @@ import { LatestAnnouncements } from "../../features/announcements/LatestAnnounce
 import { SummaryCard } from "../../features/dashboards/components/SummaryCard";
 import { defaultAdminRange, filtersToQuery, isYearToDate } from "../../features/dashboards/ranges";
 import { listDepartmentOptions } from "../../features/organization/api";
-import { formatDateTime, formatPercent, formatRupees, titleCase } from "../../lib/format";
+import { formatDateTime, formatPercent, formatRupees, formatRupeesWhole, titleCase } from "../../lib/format";
 
 function withValues(rows, key) {
   return Array.isArray(rows) && rows.some((row) => Number(row?.[key]) > 0) ? rows : [];
@@ -143,11 +144,11 @@ export function AdminDashboardPage() {
       {error ? <ErrorState title="Could not load the dashboard" message={error} onRetry={() => setFilters({ ...filters })} /> : null}
       {data ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Headcount" value={data.headcount ?? 0} hint="Active and probation on the end date." />
-            <StatCard label="Attrition" value={formatPercent(data.attritionRate)} hint={attritionHint} />
-            <StatCard label="Payroll cost" value={formatRupees(data.payrollCost)} hint="Gross pay in the selected months." />
-            <StatCard label="Average salary" value={formatRupees(data.averageSalary)} hint="Mean gross in the selected months." />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+            <StatCard label="Headcount" icon={Users} value={data.headcount ?? 0} hint="Active and probation on the end date." />
+            <StatCard label="Attrition" icon={TrendingDown} value={formatPercent(data.attritionRate)} hint={attritionHint} />
+            <StatCard label="Payroll cost" icon={Wallet} value={formatRupeesWhole(data.payrollCost)} hint="Gross pay in the selected months." />
+            <StatCard label="Average salary" icon={Banknote} value={formatRupeesWhole(data.averageSalary)} hint="Mean gross in the selected months." />
           </div>
           <SummaryCard
             summary={summary}
@@ -204,7 +205,12 @@ export function AdminDashboardPage() {
           </div>
           <LatestAnnouncements />
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">Recent audit</h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">Recent audit</h2>
+              <Button variant="ghost" to="/admin/audit">
+                View all
+              </Button>
+            </div>
             <DataTable
               caption="Latest audit rows"
               columns={[

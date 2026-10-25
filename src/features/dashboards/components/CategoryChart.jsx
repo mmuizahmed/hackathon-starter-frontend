@@ -1,5 +1,6 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { EmptyState } from "../../../components/ui";
+import { formatCompact } from "../../../lib/format";
 
 function chartColors(theme) {
   const dark = theme === "dark";
@@ -18,6 +19,7 @@ export function CategoryChart({
   valueLabel,
   theme = "light",
   formatValue,
+  formatTick = formatCompact,
   emptyTitle = "No figures",
   emptyMessage = "This chart fills in when the selected range has records.",
 }) {
@@ -34,7 +36,13 @@ export function CategoryChart({
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
           <CartesianGrid stroke={colors.grid} horizontal={false} />
-          <XAxis type="number" stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} />
+          <XAxis
+            type="number"
+            allowDecimals={false}
+            tickFormatter={formatTick}
+            stroke={colors.axis}
+            tick={{ fill: colors.axis, fontSize: 12 }}
+          />
           <YAxis
             type="category"
             dataKey={nameKey}
@@ -52,7 +60,7 @@ export function CategoryChart({
             }}
             formatter={(value) => [formatValue ? formatValue(value) : value, valueLabel]}
           />
-          <Bar dataKey={valueKey} name={valueLabel} fill="#0f766e" maxBarSize={18} />
+          <Bar dataKey={valueKey} name={valueLabel} fill="#0f766e" radius={[0, 4, 4, 0]} maxBarSize={18} />
         </BarChart>
       </ResponsiveContainer>
     </div>

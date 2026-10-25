@@ -6,7 +6,16 @@ import { checkIn, checkOut } from "../../../features/attendance/api";
 import { attendanceActionError } from "../../../features/attendance/messages";
 import { CameraCheckPanel } from "../../../features/camera/CameraCheckPanel";
 import { formatMatchScore, formatMeters } from "../../../features/camera/payload";
-import { formatTime } from "../../../lib/format";
+import { formatDate, formatTime, todayInKarachi } from "../../../lib/format";
+
+function Figure({ label, value }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{label}</dt>
+      <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-zinc-950 dark:text-zinc-50">{value}</dd>
+    </div>
+  );
+}
 
 export function CheckInWidget({ today, status, onChanged }) {
   const toast = useToast();
@@ -44,61 +53,51 @@ export function CheckInWidget({ today, status, onChanged }) {
   }
 
   return (
-    <Card title="Today">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <Card
+      title={`Today · ${formatDate(todayInKarachi())}`}
+      actions={pill ? <StatusPill status={pill} /> : <span className="text-xs text-zinc-500 dark:text-zinc-400">No status yet</span>}
+    >
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">The server records the time. A time on this device is ignored.</p>
-          <div className="mt-3">{pill ? <StatusPill status={pill} /> : <p className="text-sm text-zinc-500">No status yet</p>}</div>
-          <dl className="mt-3 space-y-1 text-sm">
-            <div className="flex gap-3">
-              <dt className="w-20 text-zinc-500 dark:text-zinc-400">Check in</dt>
-              <dd className="font-medium text-zinc-950 dark:text-zinc-50">{formatTime(row?.checkIn)}</dd>
-            </div>
-            <div className="flex gap-3">
-              <dt className="w-20 text-zinc-500 dark:text-zinc-400">Check out</dt>
-              <dd className="font-medium text-zinc-950 dark:text-zinc-50">{formatTime(row?.checkOut)}</dd>
-            </div>
+          <dl className="grid grid-cols-2 gap-6 sm:flex sm:gap-10">
+            <Figure label="Check in" value={formatTime(row?.checkIn)} />
+            <Figure label="Check out" value={formatTime(row?.checkOut)} />
             {typeof row?.location?.distanceMeters === "number" ? (
-              <div className="flex gap-3">
-                <dt className="w-20 text-zinc-500 dark:text-zinc-400">Distance</dt>
-                <dd className="font-medium text-zinc-950 dark:text-zinc-50">{formatMeters(row.location.distanceMeters)}</dd>
-              </div>
+              <Figure label="Distance" value={formatMeters(row.location.distanceMeters)} />
             ) : null}
             {typeof row?.faceMatchScore === "number" ? (
-              <div className="flex gap-3">
-                <dt className="w-20 text-zinc-500 dark:text-zinc-400">Match</dt>
-                <dd className="font-medium text-zinc-950 dark:text-zinc-50">{formatMatchScore(row.faceMatchScore)}</dd>
-              </div>
+              <Figure label="Match" value={formatMatchScore(row.faceMatchScore)} />
             ) : null}
           </dl>
+          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">The server records the time. A time on this device is ignored.</p>
         </div>
         {cameraAction ? null : (
-          <div className="flex flex-col gap-2 sm:shrink-0">
+          <div className="flex flex-col gap-2 sm:w-56 sm:shrink-0">
             {!checkedIn ? (
-              <Button className="h-12 w-full px-5 text-base sm:w-auto" loading={busy === "in"} onClick={() => run("in")}>
+              <Button className="h-11 w-full px-5" loading={busy === "in"} onClick={() => run("in")}>
                 <LogIn className="h-4 w-4" aria-hidden="true" />
                 Check in
               </Button>
             ) : null}
             {!checkedIn ? (
-              <Button className="h-12 w-full px-5 text-base sm:w-auto" variant="secondary" onClick={() => setCameraAction("in")}>
+              <Button className="h-11 w-full px-5" variant="secondary" onClick={() => setCameraAction("in")}>
                 <Camera className="h-4 w-4" aria-hidden="true" />
                 Check in with camera
               </Button>
             ) : null}
             {checkedIn && !checkedOut ? (
-              <Button className="h-12 w-full px-5 text-base sm:w-auto" variant="secondary" loading={busy === "out"} onClick={() => run("out")}>
+              <Button className="h-11 w-full px-5" variant="secondary" loading={busy === "out"} onClick={() => run("out")}>
                 <LogOut className="h-4 w-4" aria-hidden="true" />
                 Check out
               </Button>
             ) : null}
             {checkedIn && !checkedOut ? (
-              <Button className="h-12 w-full px-5 text-base sm:w-auto" variant="secondary" onClick={() => setCameraAction("out")}>
+              <Button className="h-11 w-full px-5" variant="secondary" onClick={() => setCameraAction("out")}>
                 <Camera className="h-4 w-4" aria-hidden="true" />
                 Check out with camera
               </Button>
             ) : null}
-            {checkedIn && checkedOut ? <p className="text-sm text-zinc-600 dark:text-zinc-300">You are checked out for today.</p> : null}
+            {checkedIn && checkedOut ? <p className="text-sm text-zinc-600 dark:text-zinc-300 sm:text-right">You are checked out for today.</p> : null}
           </div>
         )}
       </div>

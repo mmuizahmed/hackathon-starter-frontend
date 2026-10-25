@@ -1,6 +1,15 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { EmptyState } from "../../../components/ui";
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// "2026-10-05" becomes "5 Oct".
+function shortDay(value) {
+  const [, month, day] = String(value).split("-");
+  if (!month || !day) return String(value);
+  return `${Number(day)} ${MONTHS[Number(month) - 1] || month}`;
+}
+
 function chartColors(theme) {
   const dark = theme === "dark";
   return {
@@ -35,7 +44,8 @@ export function TrendChart({ data = [], theme = "light" }) {
               dataKey="date"
               stroke={colors.axis}
               tick={{ fill: colors.axis, fontSize: 12 }}
-              tickFormatter={(value) => String(value).slice(5)}
+              tickFormatter={shortDay}
+              minTickGap={16}
             />
             <YAxis width={48} domain={[0, 100]} stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} unit="%" />
             <Tooltip
@@ -46,6 +56,7 @@ export function TrendChart({ data = [], theme = "light" }) {
                 color: colors.tooltipText,
                 fontSize: 12,
               }}
+              labelFormatter={shortDay}
               formatter={(value) => [`${value}%`, "Attendance"]}
             />
             <Line
