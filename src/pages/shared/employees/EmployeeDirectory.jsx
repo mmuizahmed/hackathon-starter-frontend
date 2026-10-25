@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { ChevronRight, Pencil, UserX } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TemporaryPasswordDialog } from "../../../components/people/TemporaryPasswordDialog";
-import { Button, ConfirmDialog, DataTable, Input, PageHeader, Select } from "../../../components/ui";
+import { Button, ConfirmDialog, DataTable, IconButton, Input, PageHeader, Select } from "../../../components/ui";
+import { focusRing } from "../../../components/ui/styles";
+import { cn } from "../../../lib/cn";
+import { displayInitials } from "../../../lib/user";
 import { useToast } from "../../../context/ToastContext";
 import { exportEmployeesCsv, listEmployees, updateEmployee } from "../../../features/employees/api";
 import { listDepartments, listDesignations } from "../../../features/organization/api";
@@ -20,6 +24,42 @@ function catalogOptions(rows, placeholder) {
     { value: "", label: placeholder },
     ...(rows || []).map((row) => ({ value: row.id, label: row.name })),
   ];
+}
+
+function jobLine(row) {
+  return [row.designation?.name, row.department?.name].filter(Boolean).join(" · ");
+}
+
+// One phone row: the whole name block is a link to the employee's record.
+function EmployeeListRow({ row, to, actions }) {
+  return (
+    <div className="flex items-center">
+      <Link
+        to={to}
+        className={cn(
+          "flex min-w-0 flex-1 items-center gap-3 px-4 py-3 hover:bg-zinc-50 focus-visible:ring-inset dark:hover:bg-zinc-800/60",
+          focusRing,
+        )}
+      >
+        <span
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+          aria-hidden="true"
+        >
+          {displayInitials(row.name)}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium text-zinc-950 dark:text-zinc-50">{row.name}</span>
+          <span className="block truncate text-xs text-zinc-500 dark:text-zinc-400">
+            {row.code}
+            {jobLine(row) ? ` · ${jobLine(row)}` : ""}
+          </span>
+        </span>
+        {row.status === "active" ? null : <EmployeeStatus status={row.status} />}
+        <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />
+      </Link>
+      {actions ? <div className="flex shrink-0 items-center gap-1 pr-2">{actions}</div> : null}
+    </div>
+  );
 }
 
 export function EmployeeDirectory({ mode, detailBase }) {
@@ -114,13 +154,14 @@ export function EmployeeDirectory({ mode, detailBase }) {
   }
 
   const columns = [
-    { key: "code", header: "Code" },
     {
       key: "name",
-      header: "Name",
+      header: "Employee",
+      // Name and code are one link, so clicking either opens the record.
       render: (row) => (
-        <Link className="font-medium text-brand-700 hover:underline dark:text-brand-200" to={`${detailBase}/${row.id}`}>
-          {row.name}
+        <Link className={cn("group block rounded-control", focusRing)} to={`${detailBase}/${row.id}`}>
+          <span className="block font-medium text-brand-700 group-hover:underline dark:text-brand-200">{row.name}</span>
+          <span className="block text-xs text-zinc-500 dark:text-zinc-400">{row.code}</span>
         </Link>
       ),
     },
@@ -166,14 +207,16 @@ export function EmployeeDirectory({ mode, detailBase }) {
           ) : null
         }
       />
-      <form className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5" onSubmit={applyFilters}>
-        <Input
-          name="search"
-          label="Search"
-          placeholder="Name, code, or email"
-          value={draft.search}
-          onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))}
-        />
+      <form className="grid grid-cols-2 gap-3 lg:grid-cols-5" onSubmit={applyFilters}>
+        <div className="col-span-2 lg:col-span-1">
+          <Input
+            name="search"
+            label="Search"
+            placeholder="Name, code, or email"
+            value={draft.search}
+            onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))}
+          />
+        </div>
         <Select
           name="departmentId"
           label="Department"
@@ -196,8 +239,8 @@ export function EmployeeDirectory({ mode, detailBase }) {
           onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
         />
         <div className="flex items-end gap-2">
-          <Button type="submit">Apply</Button>
-          <Button type="button" variant="secondary" onClick={clearFilters}>Clear</Button>
+          <Button type="submit" className="flex-1 lg:flex-none">Apply</Button>
+          <Button type="button" variant="secondary" className="flex-1 lg:flex-none" onClick={clearFilters}>Clear</Button>
         </div>
       </form>
       <DataTable
@@ -211,6 +254,26 @@ export function EmployeeDirectory({ mode, detailBase }) {
         total={list.total}
         onPageChange={list.setPage}
         caption="Employees"
+        mobileRow={(row) => (
+          <EmployeeListRow
+            row={row}
+            to={`${detailBase}/${row.id}`}
+            actions={
+              manage ? (
+                <>
+                  <IconButton label={`Edit ${row.name}`} onClick={() => { setEditing(row); setFormOpen(true); }}>
+                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                  </IconButton>
+                  {row.status === "exited" ? null : (
+                    <IconButton label={`Mark ${row.name} as exited`} onClick={() => setExiting(row)}>
+                      <UserX className="h-4 w-4" aria-hidden="true" />
+                    </IconButton>
+                  )}
+                </>
+              ) : null
+            }
+          />
+        )}
         emptyTitle="No employees"
         emptyMessage={manage ? "Register the first employee, or import a CSV." : "Employees appear here after HR registers them."}
       />

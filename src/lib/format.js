@@ -140,3 +140,18 @@ export function titleCase(value) {
   if (!text) return "—";
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+// Dashboard cards round to whole rupees. Payslips keep the paisa with formatRupees.
+export function formatRupeesWhole(value) {
+  if (value == null || value === "") return "—";
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "—";
+  return `Rs ${new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 }).format(number)}`;
+}
+
+// Short axis labels such as 400K and 1.6M.
+export function formatCompact(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "";
+  return new Intl.NumberFormat("en-PK", { notation: "compact", maximumFractionDigits: 1 }).format(number);
+}

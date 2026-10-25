@@ -27,7 +27,9 @@ export function LeaveRecord({ request, canReview, busy, onApprove, onReject }) {
       <div className="text-sm text-zinc-800 dark:text-zinc-100 lg:col-span-3">
         <p>{request.leaveType?.name || "Leave"}</p>
         <p className="text-xs text-zinc-500">{formatDateRange(request.startDate, request.endDate)}</p>
-        <p className="text-xs text-zinc-500">{formatDays(request.days)} working days</p>
+        <p className="text-xs text-zinc-500">
+          {formatDays(request.days)} working {Number(request.days) === 1 ? "day" : "days"}
+        </p>
         <p className="mt-1 text-sm leading-5 text-zinc-700 dark:text-zinc-200">{request.reason}</p>
       </div>
       <div className="space-y-1 lg:col-span-4">

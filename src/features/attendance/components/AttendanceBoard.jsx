@@ -56,11 +56,11 @@ export function AttendanceBoard() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <div className="w-full sm:w-44">
+      <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
+        <div className="min-w-0 sm:w-44">
           <DatePicker name="boardDate" label="Date" value={date} onChange={(event) => setDate(event.target.value)} />
         </div>
-        <div className="w-full sm:w-56">
+        <div className="min-w-0 sm:w-56">
           <Select
             name="departmentId"
             label="Department"

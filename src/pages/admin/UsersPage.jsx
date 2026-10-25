@@ -83,42 +83,44 @@ export function AdminUsersPage() {
     }
   }
 
+  function statusBadges(row) {
+    return (
+      <div className="flex flex-wrap gap-1">
+        <Badge tone={row.active === false ? "neutral" : "green"}>{row.active === false ? "Inactive" : "Active"}</Badge>
+        {row.mustChangePassword ? <Badge tone="amber">Must change password</Badge> : null}
+      </div>
+    );
+  }
+
+  function rowActions(row) {
+    const self = row.id === user?.id;
+    const inactive = row.active === false;
+    return (
+      <div className="flex gap-2">
+        <Button
+          variant="secondary"
+          className="h-8 px-2"
+          disabled={self && !inactive}
+          onClick={() => setPending({ kind: inactive ? "reactivate" : "deactivate", row })}
+        >
+          {inactive ? "Reactivate" : "Deactivate"}
+        </Button>
+        <Button variant="secondary" className="h-8 px-2" onClick={() => setPending({ kind: "reset", row })}>
+          Reset password
+        </Button>
+      </div>
+    );
+  }
+
   const columns = [
     { key: "name", header: "Name" },
     { key: "email", header: "Email" },
     {
       key: "active",
       header: "Status",
-      render: (row) => (
-        <div className="flex flex-wrap gap-1">
-          <Badge tone={row.active === false ? "neutral" : "green"}>{row.active === false ? "Inactive" : "Active"}</Badge>
-          {row.mustChangePassword ? <Badge tone="amber">Must change password</Badge> : null}
-        </div>
-      ),
+      render: (row) => statusBadges(row),
     },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (row) => {
-        const self = row.id === user?.id;
-        const inactive = row.active === false;
-        return (
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              className="h-8 px-2"
-              disabled={self && !inactive}
-              onClick={() => setPending({ kind: inactive ? "reactivate" : "deactivate", row })}
-            >
-              {inactive ? "Reactivate" : "Deactivate"}
-            </Button>
-            <Button variant="ghost" className="h-8 px-2" onClick={() => setPending({ kind: "reset", row })}>
-              Reset password
-            </Button>
-          </div>
-        );
-      },
-    },
+    { key: "actions", header: "Actions", render: (row) => rowActions(row) },
   ];
 
   return (
@@ -139,6 +141,18 @@ export function AdminUsersPage() {
         total={list.total}
         onPageChange={list.setPage}
         caption="HR logins"
+        mobileRow={(row) => (
+          <div className="space-y-2 px-4 py-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-zinc-950 dark:text-zinc-50">{row.name}</p>
+                <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{row.email}</p>
+              </div>
+              {statusBadges(row)}
+            </div>
+            {rowActions(row)}
+          </div>
+        )}
         emptyTitle="No HR logins"
         emptyMessage="Create an HR login so someone else can register employees."
       />

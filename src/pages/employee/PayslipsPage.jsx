@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Button, DataTable, EmptyState, ErrorState, Input, PageHeader, Spinner } from "../../components/ui";
+import { DataTable, EmptyState, ErrorState, Input, PageHeader, Spinner } from "../../components/ui";
 import { getPayslip, listPayslips } from "../../features/payroll/api";
-import { formatRupees } from "../../lib/format";
+import { formatMonth, formatRupees } from "../../lib/format";
+import { cn } from "../../lib/cn";
+import { focusRing } from "../../components/ui/styles";
 import { PayslipView } from "./payslips/PayslipView";
 
 const LIMIT = 12;
@@ -108,21 +110,27 @@ export function EmployeePayslipsPage() {
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[18rem_minmax(0,1fr)]">
           <DataTable
             caption="Payslips by month"
+            minWidth="0"
             columns={[
-              { key: "month", header: "Month" },
-              { key: "net", header: "Net", align: "right", render: (row) => formatRupees(row.net) },
               {
-                key: "open",
-                header: "",
+                key: "month",
+                header: "Month",
                 render: (row) => (
-                  <Button
-                    variant={row.id === selectedId ? "primary" : "ghost"}
+                  <button
+                    type="button"
+                    aria-current={row.id === selectedId ? "true" : undefined}
+                    className={cn(
+                      "rounded-control text-left font-medium hover:underline",
+                      focusRing,
+                      row.id === selectedId ? "text-brand-700 dark:text-brand-200" : "text-zinc-800 dark:text-zinc-200",
+                    )}
                     onClick={() => setParams({ id: row.id })}
                   >
-                    View
-                  </Button>
+                    {formatMonth(row.month)}
+                  </button>
                 ),
               },
+              { key: "net", header: "Net", align: "right", render: (row) => formatRupees(row.net) },
             ]}
             rows={list.items}
             page={list.page || page}

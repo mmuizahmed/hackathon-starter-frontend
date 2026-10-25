@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import { Button, FormAlert, Input } from "../../components/ui";
+import { Button, FormAlert, PasswordInput } from "../../components/ui";
+import { authCardClass } from "../../components/layout/AuthBrand";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { homePathForRole } from "../../routes/navigation";
 import { MIN_PASSWORD_LENGTH } from "../../lib/validate";
@@ -69,8 +70,8 @@ export function ChangePasswordPage() {
   }
 
   return (
-    <div className="rounded-card border border-zinc-200 bg-white p-4 shadow-card dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
-      <h1 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">Change password</h1>
+    <div className={`mx-auto max-w-sm ${authCardClass}`}>
+      <h1 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">Change password</h1>
       <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
         {forced
           ? "This account is using a temporary password. Choose a new one to continue."
@@ -78,9 +79,8 @@ export function ChangePasswordPage() {
       </p>
       <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate aria-busy={submitting || undefined}>
         <FormAlert message={formError} />
-        <Input
+        <PasswordInput
           name="currentPassword"
-          type="password"
           label="Current password"
           value={currentPassword}
           error={errors.currentPassword}
@@ -88,9 +88,8 @@ export function ChangePasswordPage() {
           autoComplete="current-password"
           onChange={(event) => setCurrentPassword(event.target.value)}
         />
-        <Input
+        <PasswordInput
           name="newPassword"
-          type="password"
           label="New password"
           hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}
           value={newPassword}
@@ -99,9 +98,8 @@ export function ChangePasswordPage() {
           autoComplete="new-password"
           onChange={(event) => setNewPassword(event.target.value)}
         />
-        <Input
+        <PasswordInput
           name="confirmPassword"
-          type="password"
           label="Confirm new password"
           value={confirmPassword}
           error={errors.confirmPassword}
@@ -109,7 +107,7 @@ export function ChangePasswordPage() {
           autoComplete="new-password"
           onChange={(event) => setConfirmPassword(event.target.value)}
         />
-        <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-between">
+        <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-between">
           {forced ? (
             <Button variant="ghost" onClick={onLogout}>
               Log out

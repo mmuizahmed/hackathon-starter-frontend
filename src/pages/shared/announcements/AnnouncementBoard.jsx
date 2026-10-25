@@ -79,28 +79,30 @@ export function AnnouncementBoard({ canPost }) {
         <EmptyState title="No announcements" message="Nothing has been posted yet." />
       ) : null}
       {list.items.length > 0 ? (
-      <div className="divide-y divide-zinc-200 rounded-card border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="divide-y divide-zinc-200 rounded-card border border-zinc-200 bg-white shadow-card dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
         {list.items.map((row) => (
-          <article key={row.id} className="space-y-2 px-4 py-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{row.title}</h2>
-              <Badge tone="blue">{AUDIENCE_LABEL[row.audience] || row.audience}</Badge>
-              {row.active === false ? <Badge tone="neutral">Inactive</Badge> : null}
+          <article key={row.id} className="space-y-2 px-4 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{row.title}</h2>
+                <Badge tone="blue">{AUDIENCE_LABEL[row.audience] || row.audience}</Badge>
+                {row.active === false ? <Badge tone="neutral">Hidden</Badge> : null}
+              </div>
+              {canPost ? (
+                <Button
+                  variant="secondary"
+                  className="h-8 shrink-0 px-2"
+                  loading={workingId === row.id}
+                  onClick={() => setActive(row, row.active === false)}
+                >
+                  {row.active === false ? "Restore" : "Hide"}
+                </Button>
+              ) : null}
             </div>
             <p className="whitespace-pre-wrap text-sm leading-6 text-zinc-700 dark:text-zinc-300">{row.body}</p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               {row.createdBy?.name || "Unknown"} · {formatDateTime(row.createdAt)}
             </p>
-            {canPost ? (
-              <Button
-                variant="ghost"
-                className="h-8 px-2"
-                loading={workingId === row.id}
-                onClick={() => setActive(row, row.active === false)}
-              >
-                {row.active === false ? "Restore" : "Hide"}
-              </Button>
-            ) : null}
           </article>
         ))}
       </div>

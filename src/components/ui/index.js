@@ -1,6 +1,7 @@
 export { Badge } from "./Badge";
 export { Button } from "./Button";
 export { Card } from "./Card";
+export { CodeChip } from "./CodeChip";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { DataTable } from "./DataTable";
 export { DatePicker } from "./DatePicker";
@@ -11,6 +12,7 @@ export { FormAlert } from "./FormAlert";
 export { IconButton } from "./IconButton";
 export { Input } from "./Input";
 export { Modal } from "./Modal";
+export { PasswordInput } from "./PasswordInput";
 export { PageHeader } from "./PageHeader";
 export { Select } from "./Select";
 export { Spinner } from "./Spinner";

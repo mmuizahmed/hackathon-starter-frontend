@@ -1,5 +1,6 @@
+import { CalendarCheck, Clock, Inbox, UserCheck, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Badge, Button, Card, DataTable, ErrorState, FilterBar, PageHeader, Spinner, StatCard } from "../../components/ui";
+import { Badge, Button, Card, EmptyState, ErrorState, FilterBar, PageHeader, Spinner, StatCard } from "../../components/ui";
 import { useTheme } from "../../context/ThemeContext";
 import { summarizeDashboard } from "../../features/assistant/api";
 import { assistantProblem } from "../../features/assistant/messages";
@@ -158,12 +159,14 @@ export function HrDashboardPage() {
       {error ? <ErrorState title="Could not load the dashboard" message={error} onRetry={() => setFilters({ ...filters })} /> : null}
       {data ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            <StatCard label="Headcount" value={data.headcount ?? 0} />
-            <StatCard label="Present" value={data.presentToday ?? 0} hint="Today" />
-            <StatCard label="On leave" value={data.onLeaveToday ?? 0} hint="Today" />
-            <StatCard label="Late" value={data.lateToday ?? 0} hint="Today" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-5">
+            <StatCard label="Headcount" icon={Users} value={data.headcount ?? 0} hint="Active and probation" />
+            <StatCard label="Present" icon={UserCheck} value={data.presentToday ?? 0} hint="Today" />
+            <StatCard label="On leave" icon={CalendarCheck} value={data.onLeaveToday ?? 0} hint="Today" />
+            <StatCard label="Late" icon={Clock} value={data.lateToday ?? 0} hint="Today" />
             <StatCard
+              className="col-span-2 sm:col-span-2 xl:col-span-1"
+              icon={Inbox}
               label="Pending approvals"
               value={pending}
               hint={`${data.pendingLeave ?? 0} leave · ${data.pendingCorrections ?? 0} corrections`}
@@ -187,6 +190,7 @@ export function HrDashboardPage() {
                 valueLabel="Absenteeism"
                 theme={theme}
                 formatValue={formatPercent}
+                formatTick={(value) => `${value}%`}
                 emptyTitle="No absenteeism"
                 emptyMessage="Department rates appear when the range has expected working days."
               />
@@ -203,17 +207,21 @@ export function HrDashboardPage() {
               />
             </Card>
             <Card title="Top late arrivals">
-              <DataTable
-                caption="Top late arrivals"
-                columns={[
-                  { key: "name", header: "Name" },
-                  { key: "lateDays", header: "Late arrivals", align: "right" },
-                ]}
-                rows={data.topLateComers || []}
-                total={(data.topLateComers || []).length}
-                emptyTitle="No late arrivals"
-                emptyMessage="This list stays empty when nobody arrived late in the range."
-              />
+              {(data.topLateComers || []).length === 0 ? (
+                <EmptyState title="No late arrivals" message="This list stays empty when nobody arrived late in the range." />
+              ) : (
+                <ol className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  {data.topLateComers.map((row, index) => (
+                    <li key={row.employeeId || row.name} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                      <span className="w-5 text-sm tabular-nums text-zinc-400">{index + 1}</span>
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-zinc-950 dark:text-zinc-50">{row.name}</span>
+                      <span className="text-sm tabular-nums text-zinc-600 dark:text-zinc-300">
+                        {row.lateDays} {row.lateDays === 1 ? "late arrival" : "late arrivals"}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </Card>
           </div>
           <LatestAnnouncements />

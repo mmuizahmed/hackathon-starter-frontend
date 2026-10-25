@@ -1,6 +1,6 @@
 import { MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button, ErrorState, PageHeader, Spinner, StatCard } from "../../components/ui";
+import { Button, Card, ErrorState, PageHeader, Spinner } from "../../components/ui";
 import { listAnnouncements } from "../../features/announcements/api";
 import { listAttendance } from "../../features/attendance/api";
 import { getMyDashboard } from "../../features/dashboards/api";
@@ -93,10 +93,15 @@ export function EmployeeDashboardPage() {
       {dash ? (
         <>
           <CheckInWidget today={todayRow} status={dash.todayStatus} onChanged={reload} />
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             <WeekHours hours={dash.hoursThisWeek} expected={dash.expectedHours} />
-            <StatCard label="Late this month" value={dash.lateCount ?? 0} hint="Late arrivals from the first of the month through today." />
-            <LastPayslipCard payslip={dash.lastPayslip} />
+            <Card title="Late this month">
+              <p className="text-2xl font-semibold tabular-nums tracking-tight text-zinc-950 dark:text-zinc-50">{dash.lateCount ?? 0}</p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Late arrivals since the 1st</p>
+            </Card>
+            <div className="col-span-2 grid lg:col-span-1">
+              <LastPayslipCard payslip={dash.lastPayslip} />
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <LeaveBalanceList items={balances.length ? balances : dash.leaveBalances || []} />

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { BrandMark } from "../../components/BrandMark";
+import { AuthBrand, authCardClass } from "../../components/layout/AuthBrand";
 import { ThemeToggle } from "../../components/layout/ThemeToggle";
-import { Button, FormAlert, Input } from "../../components/ui";
+import { Button, FormAlert, Input, PasswordInput } from "../../components/ui";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { homePathForRole } from "../../routes/navigation";
 import { isEmail } from "../../lib/validate";
@@ -17,7 +16,6 @@ export function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -58,21 +56,10 @@ export function LoginPage() {
       </div>
 
       <main id="main" className="w-full max-w-sm">
-        {/* Logo block */}
-        <div className="flex flex-col items-center text-center">
-          <div className="flex items-center gap-3">
-            <BrandMark className="h-12 w-12 shrink-0 sm:h-14 sm:w-14" />
-            <span className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 sm:text-4xl">
-              HCM Lite
-            </span>
-          </div>
-          <p className="mt-3 text-xs font-medium uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
-            HR Portal
-          </p>
-        </div>
+        <AuthBrand />
 
         {/* Sign-in card */}
-        <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-6 shadow-pop dark:border-zinc-800 dark:bg-zinc-900">
+        <div className={`mt-8 ${authCardClass}`}>
           <h1 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">Sign in</h1>
           <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
             Use the email and password given to you by your company.
@@ -92,29 +79,15 @@ export function LoginPage() {
               onChange={(event) => setEmail(event.target.value)}
             />
 
-            <div className="relative">
-              <Input
-                name="password"
-                type={showPassword ? "text" : "password"}
-                label="Password"
-                value={password}
-                error={errors.password}
-                required
-                autoComplete="current-password"
-                className="pr-10"
-                onChange={(event) => setPassword(event.target.value)}
-              />
-              {/* Eye icon sits inside the field, aligned with the input (label is 28px tall). */}
-              <button
-                type="button"
-                onClick={() => setShowPassword((value) => !value)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                aria-pressed={showPassword}
-                className="absolute right-1 top-7 flex h-10 w-9 items-center justify-center rounded-control text-zinc-500 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
-              </button>
-            </div>
+            <PasswordInput
+              name="password"
+              label="Password"
+              value={password}
+              error={errors.password}
+              required
+              autoComplete="current-password"
+              onChange={(event) => setPassword(event.target.value)}
+            />
 
             <Button type="submit" loading={submitting} className="mt-2 h-11 w-full">
               Sign in
